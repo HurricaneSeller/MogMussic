@@ -4,26 +4,21 @@ import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
-import android.os.Handler;
+import android.os.Binder;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
 
 import com.example.moan.mogmussic.data.music.Music;
 import com.example.moan.mogmussic.util.Constant;
+import com.example.moan.mogmussic.util.Pool;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MusicService extends Service {
     private Music mMusic;
     private MediaPlayer mMediaPlayer;
-    private List<Music> mMusicList = new ArrayList<>();
-    //    private int index;
-    private Messenger serviceMessenger = new Messenger(new ServiceHandler());
-    private Messenger clientMessenger = null;
+    private boolean isMusicPlaying = false;
+    private String TAG = "moanbigking";
+
 
     public MusicService() {
     }
@@ -32,7 +27,7 @@ public class MusicService extends Service {
     public IBinder onBind(Intent intent) {
         mMusic = (Music) intent.getSerializableExtra(Constant.MUSIC_SERVICE);
         firstLoadSong();
-        return serviceMessenger.getBinder();
+        return new MyBinder();
     }
 
     @Override
@@ -44,7 +39,9 @@ public class MusicService extends Service {
         mMediaPlayer = new MediaPlayer();
         try {
             mMediaPlayer.setDataSource(mMusic.getUrl());
-            mMediaPlayer.prepareAsync();
+            mMediaPlayer.prepare();
+            mMediaPlayer.setLooping(false);
+            mMediaPlayer.setOnCompletionListener(mOnCompletionListener);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -52,33 +49,65 @@ public class MusicService extends Service {
 
 
     @SuppressLint("HandlerLeak")
-    class ServiceHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case Constant.Message.MEDIA_PAUSE:
-                    mMediaPlayer.pause();
-                    break;
-                case Constant.Message.MEDIA_START:
-                    mMediaPlayer.start();
-                    break;
-                default:
-                    super.handleMessage(msg);
-                    break;
-            }
-            clientMessenger = msg.replyTo;
-            Message message = Message.obtain();
-            message.what = 614;
-            if (clientMessenger != null) {
-                try {
-                    clientMessenger.send(message);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
+    class MyBinder extends Binder implements MusicContract.IMusicControl {
 
+        @Override
+        public void start() {
+            mMediaPlayer.start();
+            isMusicPlaying = true;
+            new Pool().getCachedThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    while (isMusicPlaying) {
+                        try {
+                            Thread.sleep(100);
+                            sendUpdateSeekBarBroadcast();
+
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+        }
+
+
+        @Override
+        public void pause() {
+            isMusicPlaying = false;
+            mMediaPlayer.pause();
+        }
+
+        @Override
+        public void seekToPosition(int position) {
+            mMediaPlayer.seekTo(position * 1000);
+        }
+
+        @Override
+        public void changeSong(Music music) {
+            mMusic = music;
+            mMediaPlayer.reset();
+            try {
+                mMediaPlayer.setDataSource(mMusic.getUrl());
+                mMediaPlayer.prepare();
+                mMediaPlayer.setLooping(false);
+                mMediaPlayer.setOnCompletionListener(mOnCompletionListener);
+                sendBroadcast(new Intent().setAction(Constant.Action.ACTION_RESET_FINISHED));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 
+        @Override
+        public long getCurrentDuration() {
+            return mMediaPlayer.getCurrentPosition();
+        }
+
+
+        @Override
+        public void setLooping(Boolean isLooping) {
+            mMediaPlayer.setLooping(isLooping);
+        }
     }
 
     @Override
@@ -90,24 +119,20 @@ public class MusicService extends Service {
         }
     }
 
-    private void seekToPosition(int position) {
-        mMediaPlayer.seekTo(position);
+    private void sendUpdateSeekBarBroadcast() {
+        sendBroadcast(new Intent().setAction(Constant.Action.ACTION_UPDATE_TIME));
     }
 
-    private void changeSong(Music music) {
-        mMediaPlayer.reset();
-        try {
-            mMediaPlayer.setDataSource(music.getUrl());
-            mMediaPlayer.prepareAsync();
-            mMediaPlayer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
+    private void sendMusicFinishedBroadcast() {
+        sendBroadcast(new Intent().setAction(Constant.Action.ACTION_SONG_FINISHED));
+    }
+
+    private MediaPlayer.OnCompletionListener mOnCompletionListener = new MediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mp) {
+            sendMusicFinishedBroadcast();
         }
-    }
-
-    private long getCurrentDuration() {
-        return mMediaPlayer.getDuration();
-    }
+    };
 
 }
 

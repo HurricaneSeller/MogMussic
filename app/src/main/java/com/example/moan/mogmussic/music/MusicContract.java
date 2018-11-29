@@ -1,5 +1,8 @@
 package com.example.moan.mogmussic.music;
 
+import android.content.Context;
+import android.widget.SeekBar;
+
 import com.example.moan.mogmussic.data.music.Music;
 import com.example.moan.mogmussic.data.musiclist.MusicList;
 
@@ -8,6 +11,8 @@ import java.util.concurrent.ExecutionException;
 
 public interface MusicContract {
     interface MusicView {
+        void initCurrentTime();
+
         void setCurrentTime();
 
         void setTotalTime(Music music);
@@ -27,25 +32,29 @@ public interface MusicContract {
     }
 
     interface Presenter {
-        void onClickType(int index);
-
-        void onClickPrevious();
-
-        void onClickNext();
-
-        void onClickList();
-
-        void onClickLike();
-
-        void onClickControl(Boolean isPlaying);
-
-        void onClickBack();
+        // the init
+        void initSong(Music music, SeekBar seekBar);
 
         List<Music> setMusicList(List<Music> playingMusicList, Music music);
 
         List<Music> setMusicList(List<Music> playingMusicList, MusicList musicList);
 
-        List<Music> setMusicList(List<Music> playingMusicList) throws ExecutionException, InterruptedException;
+        List<Music> setMusicList(Context context) throws ExecutionException, InterruptedException;
+
+        boolean checkIndex(Music music, List<Music> musicList, boolean isPlayNext);
     }
 
+    interface IMusicControl {
+        void start();
+
+        void pause();
+
+        void seekToPosition(int position);
+
+        void changeSong(Music music);
+
+        long getCurrentDuration();
+
+        void setLooping(Boolean isLooping);
+    }
 }

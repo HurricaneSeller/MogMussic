@@ -82,11 +82,16 @@ public class ShowSongFragment extends Fragment implements ShowContract.ShowSongs
         View view = inflater.inflate(R.layout.fragment_show_song, container, false);
         new LoadAsyncTask().execute();
         ButterKnife.bind(this, view);
-        btnBack.setOnClickListener(this);
+        setOnClickListener();
         mSwipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(getActivity(),
                 R.color.colorOrange400));
         mSwipeRefreshLayout.setOnRefreshListener(mOnRefreshListener);
         return view;
+    }
+
+    private void setOnClickListener() {
+        btnBack.setOnClickListener(this);
+        btnPlayAll.setOnClickListener(this);
     }
 
     @Override
@@ -128,6 +133,7 @@ public class ShowSongFragment extends Fragment implements ShowContract.ShowSongs
             case R.id.fra_local_play_all:
                 Intent musicIntent = new Intent();
                 musicIntent.setAction(Constant.Action.ACTION_START_MUSIC);
+                musicIntent.putExtra(Constant.Where.WHERE, Constant.Where.WHERE_CLICK_LOCAL_PLAY_ALL);
                 getActivity().sendBroadcast(musicIntent);
         }
     }
@@ -213,6 +219,7 @@ public class ShowSongFragment extends Fragment implements ShowContract.ShowSongs
                     startActivity(musicIntent);
                 }
                 else if (Constant.Where.WHERE_CLICK_LOCAL_PLAY_ALL.equals(where)) {
+                    Log.d(TAG, "onReceive: here");
                     Intent musicIntent = new Intent(getActivity(), MusicActivity.class);
                     musicIntent.putExtra(Constant.Where.WHERE, Constant.Where.WHERE_CLICK_LOCAL_PLAY_ALL);
                     startActivity(musicIntent);

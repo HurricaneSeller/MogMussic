@@ -7,12 +7,12 @@
     android:orientation="vertical">
 
     <FrameLayout
-        android:layout_margin="20dp"
         android:id="@+id/frame_layout_disc"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/bottom_layout"
-        android:layout_below="@id/head_layout"/>
+        android:layout_below="@id/head_layout"
+        android:layout_margin="20dp" />
 
     <RelativeLayout
         android:id="@+id/head_layout"
@@ -24,53 +24,65 @@
         android:orientation="horizontal">
 
         <ImageButton
-            android:layout_centerVertical="true"
-            android:background="@drawable/ic_keyboard_backspace_orange_a400_24dp"
             android:id="@+id/activity_music_back"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_gravity="center_vertical" />
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/ic_keyboard_backspace_orange_400_24dp" />
 
         <LinearLayout
-            android:layout_centerHorizontal="true"
+            android:layout_marginHorizontal="5dp"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
             android:layout_toStartOf="@id/activity_music_like"
             android:layout_toEndOf="@+id/activity_music_back"
-            android:layout_height="match_parent"
             android:orientation="vertical">
 
             <TextView
-                android:layout_gravity="center_horizontal"
-                android:textColor="@color/colorWhite"
                 android:id="@+id/activity_music_name"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:layout_gravity="center_horizontal"
                 android:layout_weight="6"
                 android:ellipsize="marquee"
+                android:gravity="center_horizontal"
                 android:singleLine="true"
+                android:textColor="@color/colorWhite"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 tools:text="影子小姐" />
 
             <TextView
-                android:layout_gravity="center_horizontal"
-                android:textColor="@color/colorWhite"
                 android:id="@+id/activity_music_info"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:layout_gravity="center_horizontal"
                 android:layout_weight="4"
+                android:ellipsize="marquee"
+                android:gravity="center_horizontal"
+                android:singleLine="true"
+                android:textColor="@color/colorLightGrey"
                 tools:text="封茗囧菌" />
         </LinearLayout>
+
         <ImageButton
             android:id="@+id/activity_music_like"
-            android:layout_centerVertical="true"
-            android:layout_alignParentEnd="true"
-            android:background="@drawable/ic_loyalty_orange_400_24dp"
             android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
             android:layout_marginStart="10dp"
-            android:layout_height="30dp" />
+            android:background="@drawable/ic_loyalty_orange_400_24dp" />
     </RelativeLayout>
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/head_layout"
+        android:layout_marginTop="5dp"
+        android:background="@color/colorOrange400" />
 
     <LinearLayout
         android:id="@+id/bottom_layout"
@@ -80,13 +92,16 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:layout_marginHorizontal="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp">
+
             <TextView
                 android:id="@+id/activity_music_current_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/colorLightGrey"
+                android:textSize="12sp"
                 tools:text="00:00" />
 
             <SeekBar
@@ -99,6 +114,8 @@
                 android:id="@+id/activity_music_total_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/colorLightGrey"
+                android:textSize="12sp"
                 tools:text="00:00" />
         </LinearLayout>
 
@@ -107,55 +124,56 @@
             android:layout_height="60dp"
             android:layout_marginBottom="20dp"
             android:horizontalSpacing="20dp">
+
             <ImageButton
-                android:layout_centerVertical="true"
-                android:background="@drawable/ic_loop_orange_a400_24dp"
                 android:id="@+id/activity_music_type"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
                 android:layout_gravity="center_vertical"
-                android:layout_margin="5dp" />
+                android:layout_margin="5dp"
+                android:background="@drawable/ic_repeat_orange_400_24dp" />
 
             <ImageButton
-                android:layout_centerVertical="true"
-                android:background="@drawable/ic_skip_previous_orange_a400_24dp"
                 android:id="@+id/activity_music_previous"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:layout_centerVertical="true"
                 android:layout_gravity="center_vertical"
                 android:layout_marginHorizontal="40dp"
                 android:layout_marginVertical="5dp"
-                android:layout_toStartOf="@id/activity_music_control" />
+                android:layout_toStartOf="@id/activity_music_control"
+                android:background="@drawable/ic_skip_previous_orange_400_24dp" />
 
             <ImageButton
-                android:background="@drawable/ic_play_circle_outline_orange_a400_24dp"
                 android:id="@+id/activity_music_control"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_centerHorizontal="true"
-                android:layout_gravity="center_vertical" />
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/ic_play_circle_outline_orange_400_24dp" />
 
             <ImageButton
-                android:layout_centerVertical="true"
-                android:background="@drawable/ic_skip_next_orange_a400_24dp"
                 android:id="@+id/activity_music_next"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:layout_centerVertical="true"
                 android:layout_gravity="center_vertical"
                 android:layout_marginHorizontal="40dp"
                 android:layout_marginVertical="5dp"
-                android:layout_toEndOf="@id/activity_music_control" />
+                android:layout_toEndOf="@id/activity_music_control"
+                android:background="@drawable/ic_skip_next_orange_400_24dp" />
 
             <ImageButton
-                android:layout_centerVertical="true"
-                android:background="@drawable/ic_skip_next_orange_a400_24dp"
                 android:id="@+id/activity_music_list"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
                 android:layout_gravity="center_vertical"
-                android:layout_margin="5dp" />
+                android:layout_margin="5dp"
+                android:background="@drawable/ic_playlist_play_orange_400_24dp" />
         </RelativeLayout>
     </LinearLayout>
 </RelativeLayout>
