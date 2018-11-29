@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:padding="20dp">
+
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="创建歌单"
+                android:textSize="25sp" />
+
+            <EditText
+                android:id="@+id/cld_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:hint="请输入歌单标题" />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/cld_check_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="设置为隐私歌单" />
+            <EditText
+                android:hint="请输入密码"
+                android:textSize="18sp"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:inputType="textPassword"
+                android:id="@+id/cld_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

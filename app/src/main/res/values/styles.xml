@@ -7,5 +7,9 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+    <style name="MyEditLine">
+        <item name="android:colorControlNormal">@color/colorBlack</item>
+        <item name="android:colorControlActivated">@color/colorWhite</item>
+    </style>
 
 </resources>

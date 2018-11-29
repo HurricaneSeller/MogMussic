@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:paddingHorizontal="10dp"
+    android:layout_height="40dp"
+    android:layout_margin="10dp">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:ignore="RelativeOverlap">
+        <TextView
+            android:id="@+id/item_title"
+            android:layout_width="250dp"
+            android:layout_height="0dp"
+            android:layout_weight="1.2"
+            tools:textColor="@color/colorBlack"
+            android:textSize="15sp"
+            android:gravity="center_vertical"
+            tools:text="我最喜欢的音乐"/>
+        <TextView
+            android:id="@+id/item_number"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            tools:text="54首"
+            android:gravity="center_vertical"
+            android:layout_weight="1"
+            android:textSize="12sp"/>
+    </LinearLayout>
+    <ImageButton
+        android:background="@drawable/ic_delete_grey_500_24dp"
+        android:id="@+id/item_delete"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_centerInParent="true"
+        android:layout_alignParentEnd="true"/>
+    <ImageView
+        android:layout_marginEnd="10dp"
+        android:layout_centerInParent="true"
+        android:layout_toStartOf="@id/item_delete"
+        android:background="@drawable/ic_lock_orange_200_24dp"
+        android:id="@+id/item_lock"
+        android:layout_width="24dp"
+        android:layout_height="24dp" />
+</RelativeLayout>
