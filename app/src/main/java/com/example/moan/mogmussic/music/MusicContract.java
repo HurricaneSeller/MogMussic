@@ -29,19 +29,35 @@ public interface MusicContract {
 
         void changeTypeIcon(int index);
 
+        void animatorStart();
+
+        void animatorPause();
+
+        void animatorResume();
+
+        void animatorChangeSong();
+
+        void animatorEnd();
+
     }
 
     interface Presenter {
         // the init
         void initSong(Music music, SeekBar seekBar);
 
-        List<Music> setMusicList(List<Music> playingMusicList, Music music);
+        List<Music> setMusicList(List<Music> nowList, String musicString, Music music);
+
+        List<Music> setMusicList(List<Music> playingMusicList, Music music) ;
 
         List<Music> setMusicList(List<Music> playingMusicList, MusicList musicList);
 
         List<Music> setMusicList(Context context) throws ExecutionException, InterruptedException;
 
         boolean checkIndex(Music music, List<Music> musicList, boolean isPlayNext);
+
+        List<MusicList> getTotalList(Context context) throws ExecutionException, InterruptedException;
+
+        void addToPlayingList(MusicList musicList, Context context, Music music);
     }
 
     interface IMusicControl {
@@ -56,5 +72,13 @@ public interface MusicContract {
         long getCurrentDuration();
 
         void setLooping(Boolean isLooping);
+
+        void updateNotificationControlIcon();
     }
+    interface IBlackDiskView{
+        void start();
+        void pause();
+        void resume();
+    }
+
 }

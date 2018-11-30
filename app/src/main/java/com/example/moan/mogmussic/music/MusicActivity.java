@@ -3,32 +3,45 @@ package com.example.moan.mogmussic.music;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.moan.mogmussic.R;
+import com.example.moan.mogmussic.music.view.LrcView;
+import com.example.moan.mogmussic.util.MusicConvert;
 import com.example.moan.mogmussic.data.music.Music;
 import com.example.moan.mogmussic.data.musiclist.MusicList;
+import com.example.moan.mogmussic.music.view.DiskView;
+import com.example.moan.mogmussic.music.view.NeedleView;
 import com.example.moan.mogmussic.util.Constant;
 import com.example.moan.mogmussic.util.TimeFormatUtil;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -62,13 +75,24 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
     TextView totalTimeView;
     @BindView(R.id.activity_music_seek_bar)
     SeekBar mSeekBar;
+    @BindView(R.id.disk_layout)
+    LinearLayout diskLayout;
+    @BindView(R.id.lyrics_layout)
+    LinearLayout lyricsLayout;
+    @BindView(R.id.lyrics_view)
+    LrcView lrcView;
+    @BindView(R.id.black_disk)
+    DiskView blackDiskView;
+    @BindView(R.id.cover_disk)
+    DiskView coverView;
+    @BindView(R.id.needle_view)
+    NeedleView needleView;
 
     private String TAG = "moanbigking";
     private MusicPresenter mMusicPresenter;
-    private boolean isMusicPlaying = false;
+    private boolean isMusicPlaying = true;
     private int type = Constant.Type.ORDER;
     private List<Music> playingMusicList;
-    //    private MusicService.ServiceHandler mMyBinder;
     private MyConn mMyConn;
     private Music playingMusic;
 
@@ -82,7 +106,8 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
     private static final int toPlay = R.drawable.ic_pause_circle_outline_orange_400_24dp;
 
     private MusicService.MyBinder mMyBinder;
-
+    private String where;
+    private boolean isDiskViewShowing = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,11 +118,20 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
         hideActionBar();
 
         Intent intent = getIntent();
-        String where = intent.getStringExtra(Constant.Where.WHERE);
+        where = intent.getStringExtra(Constant.Where.WHERE);
         switch (where) {
             case Constant.Where.WHERE_CLICK_LOCAL_SONG:
+                SharedPreferences sharedPreferences =
+                        getSharedPreferences(Constant.MUSIC_FORMAL_PLAY, MODE_PRIVATE);
+                String musicString = sharedPreferences.getString(Constant.MUSIC_FORMAL_PLAY,
+                        Constant.DEFAULT_VALUE);
                 playingMusic = (Music) intent.getSerializableExtra(Constant.MUSIC_CLICKED);
-                playingMusicList = mMusicPresenter.setMusicList(playingMusicList, playingMusic);
+                if (!Constant.DEFAULT_VALUE.equals(musicString)) {
+                    playingMusicList =
+                            mMusicPresenter.setMusicList(playingMusicList, musicString, playingMusic);
+                } else {
+                    playingMusicList = mMusicPresenter.setMusicList(playingMusicList, playingMusic);
+                }
                 break;
             case Constant.Where.WHERE_CLICK_LIST_SONG:
                 MusicList musicList = (MusicList) intent.getSerializableExtra(Constant.LIST_CLICKED);
@@ -129,9 +163,10 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
         intentFilter.addAction(Constant.Action.ACTION_UPDATE_TIME);
         intentFilter.addAction(Constant.Action.ACTION_SONG_FINISHED);
         intentFilter.addAction(Constant.Action.ACTION_BINDER_INIT);
-        intentFilter.addAction(Constant.Action.ACTION_RESET_FINISHED);
-        registerReceiver(mBroadcastReceiver, intentFilter);
+        intentFilter.addAction(Constant.Action.ACTION_CONTROL_NOTIFICATION);
+        intentFilter.addAction(Constant.Action.ACTION_FINISH);
 
+        registerReceiver(mBroadcastReceiver, intentFilter);
     }
 
 
@@ -157,18 +192,21 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
                 mMyBinder.seekToPosition(seekBar.getProgress());
             }
         });
+        diskLayout.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.activity_music_back:
-                moveTaskToBack(false);
+                moveTaskToBack(true);
+                addSongToList();
                 break;
             case R.id.activity_music_control:
                 onClickControl();
                 break;
             case R.id.activity_music_like:
+                onClickLike();
                 break;
             case R.id.activity_music_list:
                 onClickList();
@@ -182,8 +220,62 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
             case R.id.activity_music_type:
                 onClickType();
                 break;
+            case R.id.disk_layout:
+                diskLayout.setVisibility(View.GONE);
+                lyricsLayout.setVisibility(View.VISIBLE);
+                break;
         }
     }
+
+    private void onClickLike() {
+        View popupWindowView = LayoutInflater.from(MusicActivity.this)
+                .inflate(R.layout.popup_window, null);
+        final PopupWindow popupWindow = new PopupWindow(popupWindowView,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT, true);
+        popupWindow.showAtLocation(nameView, Gravity.BOTTOM, 0, 950);
+        RecyclerView recyclerView = popupWindowView.findViewById(R.id.pp_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(MusicActivity.this));
+        try {
+            recyclerView.setAdapter(new PopupWindowListAdapter(mMusicPresenter.getTotalList(this),
+                    new PopupWindowListAdapter.IAddSongToList() {
+                        @Override
+                        public void getMusicList(MusicList musicList) {
+                            if (!musicList.isHasPassword()) {
+                                mMusicPresenter.addToPlayingList(musicList,
+                                        MusicActivity.this, playingMusic);
+                            } else {
+                                showCheckDialog(musicList.getPassword(), musicList);
+                            }
+                            popupWindow.dismiss();
+                        }
+                    }));
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void showCheckDialog(final String PASSWORD, final MusicList musicList) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = LayoutInflater.from(this).inflate(R.layout.check_dialog_layout, null);
+        final EditText editText = view.findViewById(R.id.check_pswd);
+        builder.setView(view)
+                .setCancelable(true)
+                .setPositiveButton(Constant.Words.PERMITTING_OK, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String password = editText.getText().toString();
+                        if (password.equals(PASSWORD)) {
+                            mMusicPresenter.addToPlayingList(musicList ,MusicActivity.this, playingMusic);
+                        } else {
+                            Toast.makeText(MusicActivity.this, Constant.Toast.WRONG_PASSWORD,
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .create().show();
+    }
+
 
     private void onClickNext() {
         changeSong(true);
@@ -219,15 +311,28 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
                     public void bottomDialogDismiss() {
                         bottomSheetDialog.dismiss();
                     }
+
+                    @Override
+                    public void deleteSong(Music music) {
+                        playingMusicList.remove(music);
+                    }
+
+                    @Override
+                    public void toastCannotDelete() {
+                        Toast.makeText(MusicActivity.this,
+                                Constant.Toast.CANNOT_DONE, Toast.LENGTH_SHORT).show();
+                    }
                 }));
         bottomSheetDialog.show();
     }
 
     private void onClickControl() {
         if (isMusicPlaying) {
+            animatorPause();
             mMyBinder.pause();
             changeControlIcon(toPause);
         } else {
+            animatorResume();
             mMyBinder.start();
             changeControlIcon(toPlay);
         }
@@ -288,6 +393,40 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
         Toast.makeText(this, typeChangeToasts[index], Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void animatorStart() {
+        blackDiskView.start();
+        coverView.start();
+        needleView.setPivotX(65f);
+        needleView.setPivotY(40f);
+        needleView.spinDown();
+    }
+
+    @Override
+    public void animatorPause() {
+        blackDiskView.pause();
+        coverView.pause();
+        needleView.spinUp();
+    }
+
+    @Override
+    public void animatorResume() {
+        blackDiskView.resume();
+        coverView.resume();
+        needleView.spinDown();
+    }
+
+    @Override
+    public void animatorChangeSong() {
+        needleView.upThenDown();
+    }
+
+    @Override
+    public void animatorEnd() {
+        blackDiskView.stop();
+        coverView.stop();
+    }
+
     private void hideActionBar() {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -312,9 +451,12 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
         public void onServiceDisconnected(ComponentName name) {
             Log.d(TAG, "onServiceDisconnected: connected failed");
         }
+
     }
 
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        boolean isBindFinished = false;
+
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -323,18 +465,36 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
             }
             switch (action) {
                 case Constant.Action.ACTION_UPDATE_TIME:
-                    setCurrentTime();
-                    mSeekBar.setProgress((int) mMyBinder.getCurrentDuration() / 1000);
+                    if (isBindFinished) {
+                        setCurrentTime();
+                        mSeekBar.setProgress((int) mMyBinder.getCurrentDuration() / 1000);
+                    }
                     break;
                 case Constant.Action.ACTION_SONG_FINISHED:
                     changeSong(true);
                     break;
                 case Constant.Action.ACTION_BINDER_INIT:
                     mMusicPresenter.initSong(playingMusic, mSeekBar);
+                    isBindFinished = true;
+                    animatorStart();
                     break;
-                case Constant.Action.ACTION_RESET_FINISHED:
-                    isMusicPlaying = false;
-                    onClickControl();
+                case Constant.Action.ACTION_CONTROL_NOTIFICATION:
+                    String key = intent.getStringExtra(Constant.Notification.KEY);
+                    switch (key) {
+                        case Constant.Notification.KEY_CONTROL:
+                            mMyBinder.updateNotificationControlIcon();
+                            onClickControl();
+                            break;
+                        case Constant.Notification.KEY_NEXT:
+                            onClickNext();
+                            break;
+                        case Constant.Notification.KEY_PREVIOUS:
+                            onClickPrevious();
+                            break;
+                    }
+                    break;
+                case Constant.Action.ACTION_FINISH:
+                    finish();
                     break;
             }
         }
@@ -362,6 +522,36 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
         super.onDestroy();
         unbindService(mMyConn);
         unregisterReceiver(mBroadcastReceiver);
+        if (Constant.Where.WHERE_CLICK_LOCAL_SONG.equals(where)) {
+            addSongToList();
+        }
+        if (isDiskViewShowing) {
+            animatorEnd();
+        }
+    }
+
+    private void addSongToList() {
+        SharedPreferences sharedPreferences = getSharedPreferences(Constant.MUSIC_FORMAL_PLAY,
+                MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(Constant.MUSIC_FORMAL_PLAY,
+                MusicConvert.fromMusicList((ArrayList<Music>) playingMusicList));
+        editor.apply();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            moveTaskToBack(true);
+            addSongToList();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
 }

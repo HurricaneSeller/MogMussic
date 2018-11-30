@@ -1,4 +1,4 @@
-package com.example.moan.mogmussic.data;
+package com.example.moan.mogmussic.util;
 
 import com.example.moan.mogmussic.data.music.Music;
 import com.google.gson.Gson;

@@ -216,15 +216,14 @@ public class ShowSongFragment extends Fragment implements ShowContract.ShowSongs
                     Intent musicIntent = new Intent(getActivity(), MusicActivity.class);
                     musicIntent.putExtra(Constant.Where.WHERE, Constant.Where.WHERE_CLICK_LOCAL_SONG);
                     musicIntent.putExtra(Constant.MUSIC_CLICKED, music);
-                    startActivity(musicIntent);
+
+                    mShowSongsPresenter.startMusicActivity(musicIntent, getActivity());
                 }
                 else if (Constant.Where.WHERE_CLICK_LOCAL_PLAY_ALL.equals(where)) {
-                    Log.d(TAG, "onReceive: here");
                     Intent musicIntent = new Intent(getActivity(), MusicActivity.class);
                     musicIntent.putExtra(Constant.Where.WHERE, Constant.Where.WHERE_CLICK_LOCAL_PLAY_ALL);
-                    startActivity(musicIntent);
+                    mShowSongsPresenter.startMusicActivity(musicIntent, getActivity());
                 }
-
             }
         }
     };
@@ -234,4 +233,6 @@ public class ShowSongFragment extends Fragment implements ShowContract.ShowSongs
         super.onDestroy();
         getActivity().unregisterReceiver(mBroadcastReceiver);
     }
+
+
 }

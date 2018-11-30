@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.provider.MediaStore;
@@ -13,6 +14,7 @@ import com.example.moan.mogmussic.data.music.Music;
 import com.example.moan.mogmussic.data.music.MusicDatabase;
 import com.example.moan.mogmussic.show.ShowActivity;
 import com.example.moan.mogmussic.show.ShowContract;
+import com.example.moan.mogmussic.util.Constant;
 import com.example.moan.mogmussic.util.Pool;
 
 import java.util.ArrayList;
@@ -99,10 +101,10 @@ public class ShowSongPresenter implements ShowContract.ShowSongsPresenter {
             public void run() {
                 final List<Music> music = MusicDatabase.getInstance(context).musicDao().getAll();
                 mShowSongsView.setTotalMusic(music);
-                ((ShowActivity)context).runOnUiThread(new Runnable() {
+                ((ShowActivity) context).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mShowSongsView.setTotalSongNumber(music.size()+"");
+                        mShowSongsView.setTotalSongNumber(music.size() + "");
                     }
                 });
             }
@@ -116,5 +118,21 @@ public class ShowSongPresenter implements ShowContract.ShowSongsPresenter {
             ActivityCompat.requestPermissions((Activity) context,
                     new String[]{Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS}, 1);
         }
+    }
+
+    @Override
+    public void startMusicActivity(final Intent intent, final Context context) {
+        new Pool().getSingleThread().execute(new Runnable() {
+            @Override
+            public void run() {
+                context.sendBroadcast(new Intent().setAction(Constant.Action.ACTION_FINISH));
+            }
+        });
+        new Pool().getSingleThread().execute(new Runnable() {
+            @Override
+            public void run() {
+                context.startActivity(intent);
+            }
+        });
     }
 }

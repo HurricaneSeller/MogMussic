@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.moan.mogmussic.R;
@@ -39,6 +40,19 @@ public class BottomSheetDialogAdapter extends RecyclerView.Adapter<BottomSheetDi
                 mIChangeSong.bottomDialogDismiss();
             }
         });
+        viewHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Music music = mMusicList.get(viewHolder.getAdapterPosition());
+                if (mMusicList.size() != 1) {
+                    mIChangeSong.deleteSong(music);
+                    mMusicList.remove(music);
+                    BottomSheetDialogAdapter.this.notifyDataSetChanged();
+                } else {
+                    mIChangeSong.toastCannotDelete();
+                }
+            }
+        });
         return viewHolder;
     }
 
@@ -63,6 +77,7 @@ public class BottomSheetDialogAdapter extends RecyclerView.Adapter<BottomSheetDi
     class ViewHolder extends RecyclerView.ViewHolder {
         TextView titleView;
         TextView infoView;
+        ImageButton deleteButton;
         View mView;
 
         ViewHolder(@NonNull View itemView) {
@@ -70,6 +85,7 @@ public class BottomSheetDialogAdapter extends RecyclerView.Adapter<BottomSheetDi
             mView = itemView.findViewById(R.id.bss_single_song);
             titleView = itemView.findViewById(R.id.bss_title);
             infoView = itemView.findViewById(R.id.bss_info);
+            deleteButton = itemView.findViewById(R.id.bss_delete);
         }
     }
 
@@ -77,5 +93,7 @@ public class BottomSheetDialogAdapter extends RecyclerView.Adapter<BottomSheetDi
         void getSong(Music music);
         int getMusicId();
         void bottomDialogDismiss();
+        void deleteSong(Music music);
+        void toastCannotDelete();
     }
 }

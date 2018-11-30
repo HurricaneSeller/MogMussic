@@ -158,7 +158,8 @@ public class ShowFragment extends Fragment implements ShowContract.ShowView, Vie
                             mShowPresenter.changeFragment((ShowActivity) getActivity(),
                                     new ShowListFragment());
                         } else {
-                            Toast.makeText(getActivity(), "密码不正确", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), Constant.Toast.WRONG_PASSWORD,
+                                    Toast.LENGTH_SHORT).show();
                         }
                     }
                 })

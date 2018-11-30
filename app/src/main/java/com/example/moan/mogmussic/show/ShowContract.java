@@ -1,6 +1,7 @@
 package com.example.moan.mogmussic.show;
 
 import android.content.Context;
+import android.content.Intent;
 import android.widget.LinearLayout;
 
 import com.example.moan.mogmussic.data.music.Music;
@@ -71,5 +72,7 @@ public interface ShowContract {
         void getTotalMusic(Context context);
 
         void askForPermission(Context context);
+
+        void startMusicActivity(Intent intent, Context context);
     }
 }

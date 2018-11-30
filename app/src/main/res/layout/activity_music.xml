@@ -6,22 +6,44 @@
     android:background="@color/colorDimGrey"
     android:orientation="vertical">
 
-    <FrameLayout
-        android:id="@+id/frame_layout_disc"
+    <RelativeLayout
+        android:id="@+id/changeable_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/bottom_layout"
-        android:layout_below="@id/head_layout"
-        android:layout_margin="20dp" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp">
+
+        <LinearLayout
+            android:id="@+id/disk_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <include layout="@layout/disk_layout" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/lyrics_layout"
+            android:visibility="gone"
+            android:layout_marginTop="60dp"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:orientation="horizontal">
+            <com.example.moan.mogmussic.music.view.LrcView
+                android:id="@+id/lyrics_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/head_layout"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="65dp"
         android:layout_marginHorizontal="10dp"
-        android:layout_marginTop="10dp"
         android:background="@color/colorDimGrey"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="5dp">
 
         <ImageButton
             android:id="@+id/activity_music_back"
@@ -32,10 +54,10 @@
             android:background="@drawable/ic_keyboard_backspace_orange_400_24dp" />
 
         <LinearLayout
-            android:layout_marginHorizontal="5dp"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
+            android:layout_marginHorizontal="5dp"
             android:layout_toStartOf="@id/activity_music_like"
             android:layout_toEndOf="@+id/activity_music_back"
             android:orientation="vertical">
@@ -81,7 +103,6 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@id/head_layout"
-        android:layout_marginTop="5dp"
         android:background="@color/colorOrange400" />
 
     <LinearLayout
@@ -152,7 +173,7 @@
                 android:layout_height="60dp"
                 android:layout_centerHorizontal="true"
                 android:layout_gravity="center_vertical"
-                android:background="@drawable/ic_play_circle_outline_orange_400_24dp" />
+                android:background="@drawable/ic_pause_circle_outline_orange_400_24dp" />
 
             <ImageButton
                 android:id="@+id/activity_music_next"

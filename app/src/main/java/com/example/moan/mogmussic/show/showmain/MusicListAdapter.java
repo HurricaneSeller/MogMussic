@@ -1,7 +1,5 @@
 package com.example.moan.mogmussic.show.showmain;
 
-import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.moan.mogmussic.R;
-import com.example.moan.mogmussic.data.MusicConvert;
+import com.example.moan.mogmussic.util.MusicConvert;
 import com.example.moan.mogmussic.data.musiclist.MusicList;
 import com.example.moan.mogmussic.data.musiclist.MusicListDatabase;
 import com.example.moan.mogmussic.util.Pool;

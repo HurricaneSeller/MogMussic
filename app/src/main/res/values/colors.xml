@@ -4,10 +4,13 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="colorBlack">#8000</color>
+    <color name="colorOrange200">#FFCC80</color>
     <color name="colorOrange400">#FFA726</color>
+    <color name="colorDarkOrange">#FB8C00</color>
     <color name="colorWhite">#fff</color>
     <color name="colorLightGrey">#D3D3D3</color>
     <color name="colorGrey">#838383</color>
     <color name="colorDimGrey">#696969</color>
+    <color name="colorDarkDarkGrey">#313131</color>
 </resources>
 

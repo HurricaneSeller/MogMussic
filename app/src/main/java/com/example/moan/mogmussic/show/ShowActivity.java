@@ -5,12 +5,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.moan.mogmussic.R;
+import com.example.moan.mogmussic.data.music.Music;
+import com.example.moan.mogmussic.music.MusicActivity;
 import com.example.moan.mogmussic.show.showmain.ShowFragment;
+import com.example.moan.mogmussic.util.Constant;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +34,9 @@ public class ShowActivity extends AppCompatActivity implements ShowContract.ICha
     TextView artistView;
     @BindView(R.id.activity_main_control)
     ImageButton controlButton;
+    private String TAG = "moanbigking";
+    @BindView(R.id.bar)
+    View barView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +51,9 @@ public class ShowActivity extends AppCompatActivity implements ShowContract.ICha
         change(new ShowFragment());
 
         IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Constant.Action.ACTION_SET_VIEW);
         registerReceiver(changeBarBroadcastReceiver, intentFilter);
+        setOnClickListener();
     }
 
     @Override
@@ -53,22 +64,53 @@ public class ShowActivity extends AppCompatActivity implements ShowContract.ICha
         transaction.commit();
     }
 
+    private void setOnClickListener() {
+        barView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ShowActivity.this, MusicActivity.class));
+            }
+        });
+    }
+
     private BroadcastReceiver changeBarBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if(action == null) {
-                return;
-            }
-            switch (action) {
-                // TODO: 11/29/18
+            Log.d(TAG, "onReceive: " + action);
+            if (Constant.Action.ACTION_SET_VIEW.equals(action)) {
+                Music music = (Music)intent.getSerializableExtra("music");
+                setView(music);
             }
         }
     };
 
+    private void setView(Music music) {
+        nameView.setText(music.getTitle());
+        String info = music.getArtist() + ":" + music.getAlbum();
+        artistView.setText(info);
+    }
+
     @Override
     protected void onDestroy() {
+        Log.d(TAG, "onDestroy: ");
         super.onDestroy();
         unregisterReceiver(changeBarBroadcastReceiver);
+    }
+
+    private long firstTime = 0;
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+            if (System.currentTimeMillis() - firstTime > 2000) {
+                Toast.makeText(this, Constant.Toast.DOUBLE_PRESS, Toast.LENGTH_SHORT).show();
+                firstTime = System.currentTimeMillis();
+            } else {
+                sendBroadcast(new Intent().setAction(Constant.Action.ACTION_FINISH));
+                finish();
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
