@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.moan.mogmussic.R;
-import com.example.moan.mogmussic.util.MusicConvert;
+import com.example.moan.mogmussic.util.MusicUtil;
 import com.example.moan.mogmussic.data.musiclist.MusicList;
 import com.example.moan.mogmussic.data.musiclist.MusicListDatabase;
 import com.example.moan.mogmussic.util.Pool;
@@ -64,8 +64,8 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.View
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         MusicList musicList = mMusicListList.get(position);
         holder.titleView.setText(musicList.getName());
-        String count = ((MusicConvert.fromString(musicList.getMusicJsonString())) == null)
-                ? "0" : MusicConvert.fromString(musicList.getMusicJsonString()).size() + "";
+        String count = ((MusicUtil.fromString(musicList.getMusicJsonString())) == null)
+                ? "0" : MusicUtil.fromString(musicList.getMusicJsonString()).size() + "";
         String temp = "共" + count + "首";
         holder.numberView.setText(temp);
         if (musicList.isHasPassword()) {

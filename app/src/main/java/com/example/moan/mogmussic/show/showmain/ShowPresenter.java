@@ -1,30 +1,30 @@
 package com.example.moan.mogmussic.show.showmain;
 
-import android.app.AlertDialog;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ImageButton;
 
-import com.example.moan.mogmussic.R;
 import com.example.moan.mogmussic.data.musiclist.MusicList;
 import com.example.moan.mogmussic.data.musiclist.MusicListDatabase;
 import com.example.moan.mogmussic.show.ShowContract;
-import com.example.moan.mogmussic.show.showlist.ShowListFragment;
+import com.example.moan.mogmussic.util.HTTPUtil;
 import com.example.moan.mogmussic.util.Pool;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.fragment.app.Fragment;
-
 public class ShowPresenter implements ShowContract.ShowMainPresenter {
     private ShowContract.ShowView mShowView;
     private String TAG = "moanbigking";
     private List<MusicList> mMusicLists = new ArrayList<>();
+    private static final String TRANSCODE_LRC = "020222";
+    private static final String TRANSCODE_PIC = "020223";
+    private static final String TRANSCODE_MUSIC_URL = "020224";
+    private static final String TRANSCODE_SEARCH_MUSIC = "020225";
+
+
 
     public ShowPresenter(ShowContract.ShowView showView) {
         mShowView = showView;
@@ -75,19 +75,38 @@ public class ShowPresenter implements ShowContract.ShowMainPresenter {
     }
 
     @Override
-    public void changeFragment(ShowContract.IChangeFra iChangeFra, Fragment fragment) {
-        iChangeFra.change(fragment);
-    }
-
-    @Override
     public boolean hasPassword(MusicList musicList) {
         return musicList.isHasPassword();
     }
 
     @Override
-    public void check(MusicList musicList) {
-        mShowView.showCheckDialog(musicList.getPassword());
+    public void setMusicList(ShowContract.ISetMusicList iSetMusicList, MusicList musicList) {
+        iSetMusicList.setMusicList(musicList);
     }
 
+    @Override
+    public void sendOkHttpRequest(String input) {
+        if(input == null || input.length() == 0) {
+            Message message = Message.obtain();
+            message.what = 0;
+            mHandler.sendMessage(message);
+        } else {
+//            HTTPUtil.getResponse(TRANSCODE_SEARCH_MUSIC, )
+        }
+    }
 
+    @SuppressLint("HandlerLeak")
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 0:
+                    mShowView.toastInvalid();
+                    break;
+                default:
+                    super.handleMessage(msg);
+                    break;
+            }
+        }
+    };
 }

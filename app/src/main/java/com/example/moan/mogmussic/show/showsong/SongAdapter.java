@@ -35,7 +35,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 Music music = mMusicList.get(position);
                 Intent musicIntent = new Intent();
                 musicIntent.setAction(Constant.Action.ACTION_START_MUSIC);
-                musicIntent.putExtra(Constant.Where.WHERE, Constant.Where.WHERE_CLICK_LOCAL_SONG);
+                musicIntent.putExtra(Constant.Where.WHERE, Constant.Where.WHERE_CLICK_SONG);
                 musicIntent.putExtra(Constant.MUSIC_CLICKED, music);
                 parent.getContext().sendBroadcast(musicIntent);
             }

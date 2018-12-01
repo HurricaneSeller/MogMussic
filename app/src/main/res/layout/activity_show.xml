@@ -35,10 +35,10 @@
             <ImageView
                 android:layout_centerVertical="true"
                 android:layout_marginStart="5dp"
-                android:background="@drawable/default_cover"
+                android:background="@drawable/music"
                 android:id="@+id/activity_main_cover"
-                android:layout_width="50dp"
-                android:layout_height="50dp" />
+                android:layout_width="45dp"
+                android:layout_height="45dp" />
 
             <TextView
                 android:layout_marginTop="5dp"

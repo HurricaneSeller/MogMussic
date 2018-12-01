@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import com.example.moan.mogmussic.data.music.Music;
 import com.example.moan.mogmussic.data.music.MusicDatabase;
@@ -32,10 +31,6 @@ public class ShowSongPresenter implements ShowContract.ShowSongsPresenter {
         mShowSongsView = showSongsView;
     }
 
-    @Override
-    public void playAll() {
-
-    }
 
     @Override
     public void scanLocalSong(final Context context) {

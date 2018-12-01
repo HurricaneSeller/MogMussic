@@ -1,6 +1,8 @@
 package com.example.moan.mogmussic.music;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.os.Handler;
 import android.widget.SeekBar;
 
 import com.example.moan.mogmussic.data.music.Music;
@@ -15,15 +17,15 @@ public interface MusicContract {
 
         void setCurrentTime();
 
-        void setTotalTime(Music music);
+        void setTotalTime(String totalTime);
 
-        void setTitle(Music music);
+        void setTitle(String title);
 
-        void setInfo(Music music);
+        void setInfo(String info);
 
-        void setCover(Music music);
+        void setCover(Bitmap bm);
 
-        void setLyrics(Music music);
+        void setLyrics(List<LrcRow> lyrics);
 
         void changeControlIcon(int index);
 
@@ -43,7 +45,7 @@ public interface MusicContract {
 
     interface Presenter {
         // the init
-        void initSong(Music music, SeekBar seekBar);
+        void initSong(Music music, SeekBar seekBar, Context context);
 
         List<Music> setMusicList(List<Music> nowList, String musicString, Music music);
 
@@ -58,6 +60,7 @@ public interface MusicContract {
         List<MusicList> getTotalList(Context context) throws ExecutionException, InterruptedException;
 
         void addToPlayingList(MusicList musicList, Context context, Music music);
+
     }
 
     interface IMusicControl {
@@ -75,10 +78,4 @@ public interface MusicContract {
 
         void updateNotificationControlIcon();
     }
-    interface IBlackDiskView{
-        void start();
-        void pause();
-        void resume();
-    }
-
 }

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:layout_margin="5dp"
+    android:id="@+id/inner_single_song"
+    android:orientation="vertical">
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/inner_ss_check_box"
+        android:layout_centerVertical="true"
+        android:backgroundTint="@color/colorOrange400"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:layout_marginStart="5dp"
+        android:layout_centerVertical="true"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/inner_ss_check_box"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/inner_ss_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:textSize="15sp"
+            tools:text="跨越无数的夜晚"
+            android:singleLine="true" />
+
+        <TextView
+            android:id="@+id/inner_ss_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            tools:text="未知-未知" />
+    </LinearLayout>
+</RelativeLayout>

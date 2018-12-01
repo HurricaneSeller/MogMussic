@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -20,13 +21,15 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.moan.mogmussic.R;
+import com.example.moan.mogmussic.music.view.ILrcViewListener;
 import com.example.moan.mogmussic.music.view.LrcView;
-import com.example.moan.mogmussic.util.MusicConvert;
+import com.example.moan.mogmussic.util.MusicUtil;
 import com.example.moan.mogmussic.data.music.Music;
 import com.example.moan.mogmussic.data.musiclist.MusicList;
 import com.example.moan.mogmussic.music.view.DiskView;
@@ -75,6 +78,8 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
     TextView totalTimeView;
     @BindView(R.id.activity_music_seek_bar)
     SeekBar mSeekBar;
+    @BindView(R.id.changeable_view)
+    RelativeLayout mRelativeLayout;
     @BindView(R.id.disk_layout)
     LinearLayout diskLayout;
     @BindView(R.id.lyrics_layout)
@@ -192,7 +197,13 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
                 mMyBinder.seekToPosition(seekBar.getProgress());
             }
         });
-        diskLayout.setOnClickListener(this);
+        mRelativeLayout.setOnClickListener(this);
+        lrcView.setListener(new ILrcViewListener() {
+            @Override
+            public void onLrcSeeking(int newPosition, LrcRow lrcRow) {
+                mMyBinder.seekToPosition((int) lrcRow.time / 1000);
+            }
+        });
     }
 
     @Override
@@ -220,11 +231,22 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
             case R.id.activity_music_type:
                 onClickType();
                 break;
-            case R.id.disk_layout:
-                diskLayout.setVisibility(View.GONE);
-                lyricsLayout.setVisibility(View.VISIBLE);
+            case R.id.changeable_view:
+                onClickChangeableView();
                 break;
         }
+    }
+
+    private void onClickChangeableView() {
+        if (isDiskViewShowing) {
+            diskLayout.setVisibility(View.GONE);
+            lyricsLayout.setVisibility(View.VISIBLE);
+        } else {
+            lyricsLayout.setVisibility(View.GONE);
+            diskLayout.setVisibility(View.VISIBLE);
+        }
+        isDiskViewShowing = !isDiskViewShowing;
+
     }
 
     private void onClickLike() {
@@ -266,7 +288,7 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
                     public void onClick(DialogInterface dialog, int which) {
                         String password = editText.getText().toString();
                         if (password.equals(PASSWORD)) {
-                            mMusicPresenter.addToPlayingList(musicList ,MusicActivity.this, playingMusic);
+                            mMusicPresenter.addToPlayingList(musicList, MusicActivity.this, playingMusic);
                         } else {
                             Toast.makeText(MusicActivity.this, Constant.Toast.WRONG_PASSWORD,
                                     Toast.LENGTH_SHORT).show();
@@ -298,7 +320,7 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
                         mMyBinder.pause();
                         isMusicPlaying = false;
                         playingMusic = music;
-                        mMusicPresenter.initSong(playingMusic, mSeekBar);
+                        mMusicPresenter.initSong(playingMusic, mSeekBar, MusicActivity.this);
                         mMyBinder.changeSong(playingMusic);
                     }
 
@@ -356,29 +378,28 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
-    public void setTotalTime(Music music) {
-        totalTimeView.setText(TimeFormatUtil.getPerfectTime(music.getDuration()));
+    public void setTotalTime(String totalTime) {
+        totalTimeView.setText(totalTime);
     }
 
     @Override
-    public void setTitle(Music music) {
-        nameView.setText(music.getTitle());
+    public void setTitle(String title) {
+        nameView.setText(title);
     }
 
     @Override
-    public void setInfo(Music music) {
-        String info = music.getArtist() + "-" + music.getAlbum();
+    public void setInfo(String info) {
         artistView.setText(info);
     }
 
     @Override
-    public void setCover(Music music) {
-
+    public void setCover(Bitmap bm) {
+        coverView.setImageBitmap(bm);
     }
 
     @Override
-    public void setLyrics(Music music) {
-
+    public void setLyrics(List<LrcRow> lyrics) {
+        lrcView.setLrc(lyrics);
     }
 
     @Override
@@ -468,13 +489,14 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
                     if (isBindFinished) {
                         setCurrentTime();
                         mSeekBar.setProgress((int) mMyBinder.getCurrentDuration() / 1000);
+                        lrcView.seekLrcToTime(mMyBinder.getCurrentDuration());
                     }
                     break;
                 case Constant.Action.ACTION_SONG_FINISHED:
                     changeSong(true);
                     break;
                 case Constant.Action.ACTION_BINDER_INIT:
-                    mMusicPresenter.initSong(playingMusic, mSeekBar);
+                    mMusicPresenter.initSong(playingMusic, mSeekBar, MusicActivity.this);
                     isBindFinished = true;
                     animatorStart();
                     break;
@@ -513,7 +535,7 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
         } else if (type == Constant.Type.RANDOM) {
             playingMusic = playingMusicList.get(new Random().nextInt(playingMusicList.size()));
         }
-        mMusicPresenter.initSong(playingMusic, mSeekBar);
+        mMusicPresenter.initSong(playingMusic, mSeekBar, MusicActivity.this);
         mMyBinder.changeSong(playingMusic);
     }
 
@@ -522,7 +544,7 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
         super.onDestroy();
         unbindService(mMyConn);
         unregisterReceiver(mBroadcastReceiver);
-        if (Constant.Where.WHERE_CLICK_LOCAL_SONG.equals(where)) {
+        if (Constant.Where.WHERE_CLICK_SONG.equals(where)) {
             addSongToList();
         }
         if (isDiskViewShowing) {
@@ -535,7 +557,7 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
                 MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(Constant.MUSIC_FORMAL_PLAY,
-                MusicConvert.fromMusicList((ArrayList<Music>) playingMusicList));
+                MusicUtil.fromMusicList((ArrayList<Music>) playingMusicList));
         editor.apply();
     }
 

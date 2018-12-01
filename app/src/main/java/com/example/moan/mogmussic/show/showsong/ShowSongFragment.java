@@ -211,7 +211,7 @@ public class ShowSongFragment extends Fragment implements ShowContract.ShowSongs
             String action = intent.getAction();
             if (Constant.Action.ACTION_START_MUSIC.equals(action)) {
                 String where = intent.getStringExtra(Constant.Where.WHERE);
-                if(Constant.Where.WHERE_CLICK_LOCAL_SONG.equals(where)) {
+                if(Constant.Where.WHERE_CLICK_SONG.equals(where)) {
                     Music music = (Music) intent.getSerializableExtra(Constant.MUSIC_CLICKED);
                     Intent musicIntent = new Intent(getActivity(), MusicActivity.class);
                     musicIntent.putExtra(Constant.Where.WHERE, Constant.Where.WHERE_CLICK_LOCAL_SONG);

@@ -7,109 +7,37 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.util.AttributeSet;
-import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.example.moan.mogmussic.R;
 import com.example.moan.mogmussic.music.LrcRow;
 
 import java.util.List;
 
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 
 public class LrcView extends View implements ILrcView {
     List<LrcRow> mLrcRows;
-
-    /**
-     * 正常歌词模式
-     */
     public final static int DISPLAY_MODE_NORMAL = 0;
-    /**
-     * 拖动歌词模式
-     */
     public final static int DISPLAY_MODE_SEEK = 1;
-    /**
-     * 缩放歌词模式
-     */
     public final static int DISPLAY_MODE_SCALE = 2;
-    /**
-     * 歌词的当前展示模式
-     */
     private int mDisplayMode = DISPLAY_MODE_NORMAL;
-
-    /**
-     * 最小移动的距离，当拖动歌词时如果小于该距离不做处理
-     */
     private int mMinSeekFiredOffset = 10;
-
-    /**
-     * 当前高亮歌词的行数
-     */
     private int mHighlightRow = 0;
-    /**
-     * 当前高亮歌词的字体颜色为黄色
-     */
-    private int mHighlightRowColor = R.color.colorOrange200;
-    /**
-     * 不高亮歌词的字体颜色为白色
-     */
-    private int mNormalRowColor = R.color.colorWhite;
-
-    /**
-     * 拖动歌词时，在当前高亮歌词下面的一条直线的字体颜色
-     **/
-    private int mSeekLineColor = R.color.colorLightGrey;
-    /**
-     * 拖动歌词时，展示当前高亮歌词的时间的字体颜色
-     **/
-    private int mSeekLineTextColor = R.color.colorLightGrey;
-    /**
-     * 拖动歌词时，展示当前高亮歌词的时间的字体大小默认值
-     **/
-    private int mSeekLineTextSize = 15;
-    /**
-     * 拖动歌词时，展示当前高亮歌词的时间的字体大小最小值
-     **/
-    private int mMinSeekLineTextSize = 13;
-    /**
-     * 拖动歌词时，展示当前高亮歌词的时间的字体大小最大值
-     **/
-    private int mMaxSeekLineTextSize = 18;
-
-    /**
-     * 歌词字体大小默认值
-     **/
-    private int mLrcFontSize = 23;    // font size of lrc
-    /**
-     * 歌词字体大小最小值
-     **/
-    private int mMinLrcFontSize = 15;
-    /**
-     * 歌词字体大小最大值
-     **/
-    private int mMaxLrcFontSize = 35;
-
-    /**
-     * 两行歌词之间的间距
-     **/
-    private int mPaddingY = 10;
-    /**
-     * 拖动歌词时，在当前高亮歌词下面的一条直线的起始位置
-     **/
+    private int mHighlightRowColor = Color.parseColor("#FFCC80");
+    private int mNormalRowColor = Color.WHITE;
+    private int mSeekLineColor = Color.parseColor("#D3D3D3");
+    private int mSeekLineTextColor = Color.parseColor("#FFCC80");
+    private int mSeekLineTextSize = 25;
+    private int mMinSeekLineTextSize = 20;
+    private int mMaxSeekLineTextSize = 30;
+    private int mLrcFontSize = 45;    // font size of lrc
+    private int mMinLrcFontSize = 35;
+    private int mMaxLrcFontSize = 55;
+    private int mPaddingY = 50;
     private int mSeekLinePaddingX = 0;
-
-    /**
-     * 拖动歌词的监听类，回调LrcViewListener类的onLrcSeeked方法
-     **/
     private ILrcViewListener mLrcViewListener;
-
-    /**
-     * 当没有歌词的时候展示的内容
-     **/
-    private String mLoadingLrcTip = "Downloading lrc...";
-
+    private String mLoadingLrcTip = "暂无歌词";
     private Paint mPaint;
 
 
@@ -166,6 +94,8 @@ public class LrcView extends View implements ILrcView {
             rowNum--;
         }
         // below
+        rowNum = mHighlightRow + 1;
+        rowY = highlightRowY + mPaddingY + mLrcFontSize;
         while (rowY < height && rowNum < mLrcRows.size()) {
             String text = mLrcRows.get(rowNum).content;
             canvas.drawText(text, rowX, rowY, mPaint);
@@ -349,7 +279,7 @@ public class LrcView extends View implements ILrcView {
         mHighlightRow = position;
         invalidate();
         if (mLrcViewListener != null && isToBeHighlightLrcRow) {
-            mLrcViewListener.onLrcSeeked(position, lrcRow);
+            mLrcViewListener.onLrcSeeking(position, lrcRow);
         }
     }
 

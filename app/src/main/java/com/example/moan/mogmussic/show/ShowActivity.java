@@ -9,14 +9,17 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.moan.mogmussic.R;
 import com.example.moan.mogmussic.data.music.Music;
+import com.example.moan.mogmussic.data.musiclist.MusicList;
 import com.example.moan.mogmussic.music.MusicActivity;
 import com.example.moan.mogmussic.show.showmain.ShowFragment;
 import com.example.moan.mogmussic.util.Constant;
+import com.example.moan.mogmussic.util.MusicUtil;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,7 +30,7 @@ import androidx.fragment.app.FragmentTransaction;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ShowActivity extends AppCompatActivity implements ShowContract.IChangeFra {
+public class ShowActivity extends AppCompatActivity implements ShowContract.IChangeFra,ShowContract.ISetMusicList {
     @BindView(R.id.activity_main_name)
     TextView nameView;
     @BindView(R.id.activity_main_artist)
@@ -37,6 +40,10 @@ public class ShowActivity extends AppCompatActivity implements ShowContract.ICha
     private String TAG = "moanbigking";
     @BindView(R.id.bar)
     View barView;
+    @BindView(R.id.activity_main_cover)
+    ImageView coverView;
+
+    MusicList mMusicList = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +67,7 @@ public class ShowActivity extends AppCompatActivity implements ShowContract.ICha
     public void change(Fragment fragment) {
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
+        transaction.addToBackStack("");
         transaction.replace(R.id.activity_main_frame_layout, fragment);
         transaction.commit();
     }
@@ -77,7 +85,6 @@ public class ShowActivity extends AppCompatActivity implements ShowContract.ICha
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            Log.d(TAG, "onReceive: " + action);
             if (Constant.Action.ACTION_SET_VIEW.equals(action)) {
                 Music music = (Music)intent.getSerializableExtra("music");
                 setView(music);
@@ -89,6 +96,8 @@ public class ShowActivity extends AppCompatActivity implements ShowContract.ICha
         nameView.setText(music.getTitle());
         String info = music.getArtist() + ":" + music.getAlbum();
         artistView.setText(info);
+        coverView.setImageBitmap(MusicUtil.getArtWork(this, (int)music.getId() ,
+                (int)music.getAlbum_id(), true, music.getTitle()));
     }
 
     @Override
@@ -112,5 +121,15 @@ public class ShowActivity extends AppCompatActivity implements ShowContract.ICha
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void setMusicList(MusicList musicList) {
+        mMusicList = musicList;
+    }
+
+    @Override
+    public MusicList getMusicList() {
+        return mMusicList;
     }
 }

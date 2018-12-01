@@ -31,14 +31,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.moan.mogmussic.R;
-import com.example.moan.mogmussic.data.music.Music;
 import com.example.moan.mogmussic.data.musiclist.MusicList;
-import com.example.moan.mogmussic.music.MusicActivity;
 import com.example.moan.mogmussic.show.ShowActivity;
 import com.example.moan.mogmussic.show.ShowContract;
 import com.example.moan.mogmussic.show.showlist.ShowListFragment;
 import com.example.moan.mogmussic.show.showsong.ShowSongFragment;
 import com.example.moan.mogmussic.util.Constant;
+import com.example.moan.mogmussic.util.Pool;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,10 +76,15 @@ public class ShowFragment extends Fragment implements ShowContract.ShowView, Vie
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mShowPresenter = new ShowPresenter(this);
+    }
+
+    @Override
+    public void onResume() {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("mog.refresh_list");
         getActivity().registerReceiver(mBroadcastReceiver, intentFilter);
         Log.d(TAG, "onCreate: register");
+        super.onResume();
     }
 
     @Override
@@ -116,16 +120,25 @@ public class ShowFragment extends Fragment implements ShowContract.ShowView, Vie
         numberView.setText(number);
     }
 
+    @Override
+    public void toastInvalid() {
+        Toast.makeText(getActivity(), Constant.Toast.INPUT_INVALID,
+                Toast.LENGTH_SHORT).show();
+
+    }
+
 
     private void initView() {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mMusicListAdapter = new MusicListAdapter(mMusicLists, new MusicListAdapter.IMusicChosen() {
             @Override
-            public void getMusicChosen(MusicList musicListChosen) {
+            public void getMusicChosen(final MusicList musicListChosen) {
                 if (!mShowPresenter.hasPassword(musicListChosen)) {
-                    mShowPresenter.changeFragment((ShowActivity) getActivity(), new ShowListFragment());
+                    mShowPresenter.setMusicList((ShowActivity) getActivity(), musicListChosen);
+                    changeFragment((ShowActivity) getActivity(),
+                            new ShowListFragment());
                 } else {
-                    mShowPresenter.check(musicListChosen);
+                    showCheckDialog(musicListChosen);
                 }
             }
 
@@ -144,18 +157,19 @@ public class ShowFragment extends Fragment implements ShowContract.ShowView, Vie
     }
 
     @Override
-    public void showCheckDialog(final String PASSWORD) {
+    public void showCheckDialog(final MusicList musicListChosen) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.check_dialog_layout, null);
         final EditText editText = view.findViewById(R.id.check_pswd);
         builder.setView(view)
                 .setCancelable(true)
-                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                .setPositiveButton(Constant.Words.PERMITTING_OK, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String password = editText.getText().toString();
-                        if (password.equals(PASSWORD)) {
-                            mShowPresenter.changeFragment((ShowActivity) getActivity(),
+                        if (password.equals(musicListChosen.getPassword())) {
+                            mShowPresenter.setMusicList((ShowActivity) getActivity(), musicListChosen);
+                            changeFragment((ShowActivity) getActivity(),
                                     new ShowListFragment());
                         } else {
                             Toast.makeText(getActivity(), Constant.Toast.WRONG_PASSWORD,
@@ -164,6 +178,11 @@ public class ShowFragment extends Fragment implements ShowContract.ShowView, Vie
                     }
                 })
                 .create().show();
+    }
+
+    @Override
+    public void changeFragment(ShowContract.IChangeFra iChangeFra, Fragment fragment) {
+        iChangeFra.change(fragment);
     }
 
 
@@ -206,10 +225,11 @@ public class ShowFragment extends Fragment implements ShowContract.ShowView, Vie
                 break;
             case R.id.fra_search:
                 String input = searchView.getText().toString();
-                // TODO: 11/27/18
+                mShowPresenter.sendOkHttpRequest(input);
                 break;
             case R.id.fra_local:
-                mShowPresenter.changeFragment((ShowActivity)getActivity(), new ShowSongFragment());
+                changeFragment((ShowActivity) getActivity(),
+                        new ShowSongFragment());
                 break;
         }
     }

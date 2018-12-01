@@ -3,7 +3,8 @@ package com.example.moan.mogmussic.util;
 public class Constant {
     public class Where {
         public static final String WHERE = "where";
-        public static final String WHERE_CLICK_LOCAL_SONG = "song";
+        public static final String WHERE_CLICK_SONG = "song";
+        public static final String WHERE_CLICK_LOCAL_SONG = "local_song";
         public static final String WHERE_CLICK_LOCAL_PLAY_ALL = "all";
         public static final String WHERE_CLICK_LIST_SONG = "list_song";
         public static final String WHERE_CLICK_LIST_PLAY_ALL = "list_all";
@@ -14,6 +15,7 @@ public class Constant {
     public static final String MUSIC_SERVICE = "music_service";
     public static final String MUSIC_FORMAL_PLAY = "music_formal_play";
     public static final String DEFAULT_VALUE = "mog";
+    public static final String MUSIC_LIST_CHOSEN = "mog.music_list_clicked";
 
     public class Action {
         public static final String ACTION_REFRESH_LIST = "mog.music.refresh_list";
@@ -34,10 +36,11 @@ public class Constant {
         public static final String T_ORDER = "列表播放";
         public static final String T_RANDOM = "随机播放";
     }
-    public class Notification{
-        public static final String CHANNEL_ID = "111";
+
+    public class Notification {
+        public static final String CHANNEL_ID = "moanbigking.mussic";
         public static final int ID = 111;
-        public static final String CHANNEL_NAME = "channel_name";
+        public static final String CHANNEL_NAME = "mogmussic.channel_name";
         public static final String CONTROL = "control";
         public static final int REQUEST_CONTROL = 222;
         public static final int REQUEST_NEXT = 333;
@@ -48,13 +51,19 @@ public class Constant {
         public static final String KEY_NEXT = "click_next";
         public static final String KEY_PREVIOUS = "click_previous";
     }
-    public class Toast{
+
+    public class Toast {
         public static final String CANNOT_DONE = "操作失败";
         public static final String DOUBLE_PRESS = "再按一次退出程序";
         public static final String WRONG_PASSWORD = "密码不正确";
+        public static final String INPUT_INVALID = "没有找到";
     }
+
     public class Words {
         public static final String PERMITTING_OK = "确定";
     }
 
+    public class Key {
+        public static final String LYRICS = "handler.lyrics";
+    }
 }

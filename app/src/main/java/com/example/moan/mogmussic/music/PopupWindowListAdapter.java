@@ -7,7 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.moan.mogmussic.R;
-import com.example.moan.mogmussic.util.MusicConvert;
+import com.example.moan.mogmussic.util.MusicUtil;
 import com.example.moan.mogmussic.data.musiclist.MusicList;
 
 import java.util.List;
@@ -43,8 +43,8 @@ public class PopupWindowListAdapter extends RecyclerView.Adapter<PopupWindowList
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         MusicList musicList = mMusicLists.get(position);
         holder.titleView.setText(musicList.getName());
-        String count = ((MusicConvert.fromString(musicList.getMusicJsonString())) == null)
-                ? "0" : MusicConvert.fromString(musicList.getMusicJsonString()).size() + "";
+        String count = ((MusicUtil.fromString(musicList.getMusicJsonString())) == null)
+                ? "0" : MusicUtil.fromString(musicList.getMusicJsonString()).size() + "";
         String temp = "共" + count + "首";
         holder.numberView.setText(temp);
         if (musicList.isHasPassword()) {

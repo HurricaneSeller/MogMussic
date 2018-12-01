@@ -27,7 +27,7 @@ public class LrcRow implements Comparable<LrcRow> {
 
     //[02:34.14][01:07.00x]当你我不小心又想起她
     public static List<LrcRow> createRows(String standardLrcLine) {
-        if (standardLrcLine.indexOf("[") != 0 || standardLrcLine.indexOf("]") != 9) {
+        if (standardLrcLine == null||standardLrcLine.indexOf("[") != 0 || standardLrcLine.indexOf("]") != 9) {
             return null;
         }
         Pattern pattern = Pattern.compile("\\[\\d{2}[\\s\\S]*");

@@ -157,7 +157,12 @@ public class MusicService extends Service {
     private MediaPlayer.OnCompletionListener mOnCompletionListener = new MediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(MediaPlayer mp) {
-            sendBroadcast(new Intent().setAction(Constant.Action.ACTION_SONG_FINISHED));
+            new Pool().getCachedThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    sendBroadcast(new Intent().setAction(Constant.Action.ACTION_SONG_FINISHED));
+                }
+            });
         }
     };
 
@@ -165,18 +170,28 @@ public class MusicService extends Service {
         @Override
         public void onPrepared(MediaPlayer mp) {
             mp.start();
-            sendSetUpBottomControlViewBroadcast();
-            sendUpdateSeekBarBroadcast();
+            Log.d(TAG, "onPrepared: ");
+            Log.d(TAG, "onPrepared: " + mp.isPlaying());
+            new Pool().getCachedThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    sendSetUpBottomControlViewBroadcast();
+                    sendUpdateSeekBarBroadcast();
+                }
+            });
         }
     };
 
 
     // TODO: 11/30/18 refresh the view !
     private void setForegroundService() {
-        int importance = NotificationManager.IMPORTANCE_LOW;
+        int importance = NotificationManager.IMPORTANCE_MIN;
         NotificationChannel notificationChannel =
                 new NotificationChannel(Constant.Notification.CHANNEL_ID,
                         Constant.Notification.CHANNEL_NAME, importance);
+        notificationChannel.enableVibration(false);
+        notificationChannel.setSound(null, null);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this,
                 Constant.Notification.CHANNEL_ID);
         notificationView = new RemoteViews(getPackageName(), R.layout.notification_layout);
@@ -220,6 +235,7 @@ public class MusicService extends Service {
                 .setContentIntent(startActivityPendingIntent)
                 .setSound(null)
                 .setVibrate(null)
+                .setOnlyAlertOnce(true)
                 .setContent(notificationView);
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.createNotificationChannel(notificationChannel);
