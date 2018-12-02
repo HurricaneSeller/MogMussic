@@ -47,6 +47,8 @@ public interface MusicContract {
         // the init
         void initSong(Music music, SeekBar seekBar, Context context);
 
+        void initSong(Music music, SeekBar seekBar, Context context, String url);
+
         List<Music> setMusicList(List<Music> nowList, String musicString, Music music);
 
         List<Music> setMusicList(List<Music> playingMusicList, Music music) ;

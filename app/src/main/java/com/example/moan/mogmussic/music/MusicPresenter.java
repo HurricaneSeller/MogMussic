@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.ParcelFileDescriptor;
 import android.widget.SeekBar;
+import android.widget.TabHost;
 
 import com.example.moan.mogmussic.data.music.Music;
 import com.example.moan.mogmussic.data.music.MusicDatabase;
@@ -40,6 +41,7 @@ public class MusicPresenter implements MusicContract.Presenter {
     private MusicContract.MusicView mMusicView;
     private String TAG = "moanbigking";
     private boolean isFirstPlay = true;
+    private Bitmap mBitmap;
 
 
     MusicPresenter(MusicContract.MusicView musicView) {
@@ -60,6 +62,38 @@ public class MusicPresenter implements MusicContract.Presenter {
         getLyrics(music, mHandler);
         mMusicView.setCover(MusicUtil.getArtWork(context,(int) music.getId(),(int) music.getAlbum_id(),
                 true, music.getTitle()));
+    }
+
+    @Override
+    public void initSong(Music music, SeekBar seekBar, Context context, final String url) {
+        mMusicView.setTotalTime(TimeFormatUtil.getPerfectTime(music.getDuration()));
+        mMusicView.setInfo(music.getArtist() + "-" + music.getAlbum());
+        mMusicView.setTitle(music.getTitle());
+        mMusicView.initCurrentTime();
+        if (!isFirstPlay) {
+            mMusicView.animatorChangeSong();
+        }
+        seekBar.setMax((int) music.getDuration() / 1000);
+        isFirstPlay = false;
+        getLyrics(music, mHandler);
+        new Pool().getCachedThread().execute(new Runnable() {
+            @Override
+            public void run() {
+                mBitmap = HTTPUtil.downloadImage(url);
+                while (mBitmap == null) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if(mBitmap != null) {
+                    Message message = Message.obtain();
+                    message.what = 666;
+                    mHandler.sendMessage(message);
+                }
+            }
+        });
     }
 
     @Override
@@ -239,14 +273,16 @@ public class MusicPresenter implements MusicContract.Presenter {
                 case 0:
                     Bundle bundle = msg.getData();
                     String lyrics = bundle.getString(Constant.Key.LYRICS);
-                    List<LrcRow> lrcRows = null;
+                    List<LrcRow> lrcRows;
                     try {
                         lrcRows = LrcRow.getLrcRows(lyrics);
                         mMusicView.setLyrics(lrcRows);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
+                case 666:
+                    mMusicView.setCover(mBitmap);
+                    break;
                 default:
                     super.handleMessage(msg);
                     break;

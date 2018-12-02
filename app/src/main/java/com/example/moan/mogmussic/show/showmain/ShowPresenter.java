@@ -84,29 +84,4 @@ public class ShowPresenter implements ShowContract.ShowMainPresenter {
         iSetMusicList.setMusicList(musicList);
     }
 
-    @Override
-    public void sendOkHttpRequest(String input) {
-        if(input == null || input.length() == 0) {
-            Message message = Message.obtain();
-            message.what = 0;
-            mHandler.sendMessage(message);
-        } else {
-//            HTTPUtil.getResponse(TRANSCODE_SEARCH_MUSIC, )
-        }
-    }
-
-    @SuppressLint("HandlerLeak")
-    private Handler mHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 0:
-                    mShowView.toastInvalid();
-                    break;
-                default:
-                    super.handleMessage(msg);
-                    break;
-            }
-        }
-    };
 }

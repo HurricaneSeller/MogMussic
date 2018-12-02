@@ -8,6 +8,7 @@ public class Constant {
         public static final String WHERE_CLICK_LOCAL_PLAY_ALL = "all";
         public static final String WHERE_CLICK_LIST_SONG = "list_song";
         public static final String WHERE_CLICK_LIST_PLAY_ALL = "list_all";
+        public static final String WHERE_ONLINE = "mog.online";
     }
 
     public static final String MUSIC_CLICKED = "music_clicked";
@@ -16,6 +17,8 @@ public class Constant {
     public static final String MUSIC_FORMAL_PLAY = "music_formal_play";
     public static final String DEFAULT_VALUE = "mog";
     public static final String MUSIC_LIST_CHOSEN = "mog.music_list_clicked";
+    public static final String ONLINE_SONG_CLICKED = "mog.online_song_clicked";
+    public static final String ONLINE_CACHE = "mog.online_cache";
 
     public class Action {
         public static final String ACTION_REFRESH_LIST = "mog.music.refresh_list";
@@ -65,5 +68,6 @@ public class Constant {
 
     public class Key {
         public static final String LYRICS = "handler.lyrics";
+        public static final String ONLINE = "mog.online";
     }
 }

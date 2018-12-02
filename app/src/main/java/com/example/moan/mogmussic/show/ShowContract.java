@@ -24,7 +24,6 @@ public interface ShowContract {
     interface ShowView {
         void setListsNumber(String number);
 
-        void toastInvalid();
 
         void setMusicLists(List<MusicList> musicLists);
 
@@ -44,7 +43,6 @@ public interface ShowContract {
 
         void setMusicList(ISetMusicList iSetMusicList, MusicList musicList);
 
-        void sendOkHttpRequest(String input);
     }
 
 

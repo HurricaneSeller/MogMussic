@@ -20,13 +20,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".music.MusicActivity"
-            android:launchMode="singleInstance"/>
+        <activity
+            android:name=".music.MusicActivity"
+            android:launchMode="singleInstance" />
 
         <service
             android:name=".music.MusicService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity android:name=".online.OnlineActivity"></activity>
     </application>
 
 </manifest>

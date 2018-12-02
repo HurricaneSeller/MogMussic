@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -50,11 +52,7 @@ public class ShowActivity extends AppCompatActivity implements ShowContract.ICha
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show);
         ButterKnife.bind(this);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.hide();
-        }
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.colorOrange400));
+        hideActionBar();
         change(new ShowFragment());
 
         IntentFilter intentFilter = new IntentFilter();
@@ -63,6 +61,14 @@ public class ShowActivity extends AppCompatActivity implements ShowContract.ICha
         setOnClickListener();
     }
 
+    private void hideActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.colorOrange400));
+
+    }
     @Override
     public void change(Fragment fragment) {
         FragmentManager manager = getSupportFragmentManager();
@@ -102,7 +108,6 @@ public class ShowActivity extends AppCompatActivity implements ShowContract.ICha
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "onDestroy: ");
         super.onDestroy();
         unregisterReceiver(changeBarBroadcastReceiver);
     }

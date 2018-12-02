@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -27,8 +28,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.moan.mogmussic.R;
+import com.example.moan.mogmussic.gson.OnlineSong;
 import com.example.moan.mogmussic.music.view.ILrcViewListener;
 import com.example.moan.mogmussic.music.view.LrcView;
+import com.example.moan.mogmussic.online.OAPresenter;
 import com.example.moan.mogmussic.util.MusicUtil;
 import com.example.moan.mogmussic.data.music.Music;
 import com.example.moan.mogmussic.data.musiclist.MusicList;
@@ -113,6 +116,9 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
     private MusicService.MyBinder mMyBinder;
     private String where;
     private boolean isDiskViewShowing = true;
+    private boolean isOnline = false;
+    private OnlineSong onlineSong;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,6 +162,20 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
                 playingMusicList = mMusicPresenter.setMusicList(playingMusicList, musicList2);
                 playingMusic = playingMusicList.get(0);
                 break;
+            case Constant.Where.WHERE_ONLINE:
+                isOnline = true;
+                onlineSong = (OnlineSong) intent.getSerializableExtra(Constant.ONLINE_SONG_CLICKED);
+                Music music = new Music();
+                music.setAlbum(null);
+                music.setTitle(onlineSong.getTitle());
+                music.setArtist(onlineSong.getAuthor());
+                music.setUrl(onlineSong.getUrl());
+                music.setAlbum_id(-1);
+                music.setDuration(onlineSong.getTime() * 1000);
+                playingMusic = music;
+                playingMusicList = mMusicPresenter.setMusicList(playingMusicList, music);
+                break;
+
         }
 
         setOnclickListener();
@@ -496,7 +516,11 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
                     changeSong(true);
                     break;
                 case Constant.Action.ACTION_BINDER_INIT:
-                    mMusicPresenter.initSong(playingMusic, mSeekBar, MusicActivity.this);
+                    if (!isOnline) {
+                        mMusicPresenter.initSong(playingMusic, mSeekBar, MusicActivity.this);
+                    } else {
+                        mMusicPresenter.initSong(playingMusic, mSeekBar, MusicActivity.this, onlineSong.getPic());
+                    }
                     isBindFinished = true;
                     animatorStart();
                     break;

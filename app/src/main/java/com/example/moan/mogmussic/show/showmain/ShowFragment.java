@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import com.example.moan.mogmussic.R;
 import com.example.moan.mogmussic.data.musiclist.MusicList;
+import com.example.moan.mogmussic.online.OnlineActivity;
 import com.example.moan.mogmussic.show.ShowActivity;
 import com.example.moan.mogmussic.show.ShowContract;
 import com.example.moan.mogmussic.show.showlist.ShowListFragment;
@@ -95,6 +96,7 @@ public class ShowFragment extends Fragment implements ShowContract.ShowView, Vie
         ButterKnife.bind(this, view);
         btnCreateList.setOnClickListener(this);
         localView.setOnClickListener(this);
+        btnSearchOnline.setOnClickListener(this);
         new LoadAsyncTask().execute();
         return view;
     }
@@ -118,13 +120,6 @@ public class ShowFragment extends Fragment implements ShowContract.ShowView, Vie
     @Override
     public void setListsNumber(String number) {
         numberView.setText(number);
-    }
-
-    @Override
-    public void toastInvalid() {
-        Toast.makeText(getActivity(), Constant.Toast.INPUT_INVALID,
-                Toast.LENGTH_SHORT).show();
-
     }
 
 
@@ -225,7 +220,9 @@ public class ShowFragment extends Fragment implements ShowContract.ShowView, Vie
                 break;
             case R.id.fra_search:
                 String input = searchView.getText().toString();
-                mShowPresenter.sendOkHttpRequest(input);
+                Intent intent = new Intent(getActivity(), OnlineActivity.class);
+                intent.putExtra(Constant.Key.ONLINE, input);
+                getActivity().startActivity(intent);
                 break;
             case R.id.fra_local:
                 changeFragment((ShowActivity) getActivity(),
