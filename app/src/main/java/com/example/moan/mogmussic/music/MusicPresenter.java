@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.ParcelFileDescriptor;
+import android.util.Log;
 import android.widget.SeekBar;
 import android.widget.TabHost;
 
@@ -17,6 +18,7 @@ import com.example.moan.mogmussic.data.music.Music;
 import com.example.moan.mogmussic.data.music.MusicDatabase;
 import com.example.moan.mogmussic.data.musiclist.MusicList;
 import com.example.moan.mogmussic.data.musiclist.MusicListDatabase;
+import com.example.moan.mogmussic.gson.OnlineSong;
 import com.example.moan.mogmussic.util.Constant;
 import com.example.moan.mogmussic.util.HTTPUtil;
 import com.example.moan.mogmussic.util.MusicUtil;
@@ -36,6 +38,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MusicPresenter implements MusicContract.Presenter {
     private MusicContract.MusicView mMusicView;
@@ -60,26 +64,26 @@ public class MusicPresenter implements MusicContract.Presenter {
         seekBar.setMax((int) music.getDuration() / 1000);
         isFirstPlay = false;
         getLyrics(music, mHandler);
-        mMusicView.setCover(MusicUtil.getArtWork(context,(int) music.getId(),(int) music.getAlbum_id(),
+        mMusicView.setCover(MusicUtil.getArtWork(context, (int) music.getId(), (int) music.getAlbum_id(),
                 true, music.getTitle()));
     }
 
     @Override
-    public void initSong(Music music, SeekBar seekBar, Context context, final String url) {
+    public void initSong(Music music, SeekBar seekBar, Context context, final OnlineSong onlineSong) {
         mMusicView.setTotalTime(TimeFormatUtil.getPerfectTime(music.getDuration()));
         mMusicView.setInfo(music.getArtist() + "-" + music.getAlbum());
         mMusicView.setTitle(music.getTitle());
         mMusicView.initCurrentTime();
+        mMusicView.setDownloadButton();
         if (!isFirstPlay) {
             mMusicView.animatorChangeSong();
         }
         seekBar.setMax((int) music.getDuration() / 1000);
         isFirstPlay = false;
-        getLyrics(music, mHandler);
         new Pool().getCachedThread().execute(new Runnable() {
             @Override
             public void run() {
-                mBitmap = HTTPUtil.downloadImage(url);
+                mBitmap = HTTPUtil.downloadImage(onlineSong.getPic());
                 while (mBitmap == null) {
                     try {
                         Thread.sleep(100);
@@ -87,13 +91,14 @@ public class MusicPresenter implements MusicContract.Presenter {
                         e.printStackTrace();
                     }
                 }
-                if(mBitmap != null) {
+                if (mBitmap != null) {
                     Message message = Message.obtain();
                     message.what = 666;
                     mHandler.sendMessage(message);
                 }
             }
         });
+        getLyricsByKuGouAPI(onlineSong, mHandler);
     }
 
     @Override
@@ -153,6 +158,24 @@ public class MusicPresenter implements MusicContract.Presenter {
         });
     }
 
+    @Override
+    public void downloadSong(final OnlineSong onlineSong, final Context context) {
+        new Pool().getCachedThread().execute(new Runnable() {
+            @Override
+            public void run() {
+                HTTPUtil.downloadSong(onlineSong.getUrl(), onlineSong.getTitle(), context);
+            }
+        });
+        new Pool().getCachedThread().execute(new Runnable() {
+            @Override
+            public void run() {
+                HTTPUtil.downloadCover(onlineSong.getPic(), onlineSong.getTitle(), context);
+            }
+        });
+
+
+    }
+
     private void getLyrics(Music music, Handler handler) {
         String lyrics = getLocalLyrics(music);
         if (lyrics == null) {
@@ -191,6 +214,55 @@ public class MusicPresenter implements MusicContract.Presenter {
 
     }
 
+    private void getLyricsByKuGouAPI(final OnlineSong onlineSong, final Handler handler) {
+        String standard = onlineSong.getUrl();
+        String id = null;
+        Pattern pattern = Pattern.compile("id=([\\S\\s])*&");
+        Matcher matcher = pattern.matcher(standard);
+        if (matcher.find()) {
+            id = matcher.group();
+        }
+        final String finalId = id.substring(3, id.length() - 1);
+        Log.d(TAG, "getLyricsByKuGouAPI: " + finalId);
+        new Pool().getCachedThread().execute(new Runnable() {
+            String base = null;
+            String lyrics = null;
+
+            @Override
+            public void run() {
+                base = HTTPUtil.getResponse("020222", "SongId", finalId);
+                String temp = null;
+                while (base == null) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                Pattern pattern1 = Pattern.compile("\"Body\":\"([\\S\\s])*&type=lrc");
+                Matcher matcher1 = pattern1.matcher(base);
+                if (matcher1.find()) {
+                    temp = matcher1.group();
+                    temp = temp.substring(8, temp.length());
+                    lyrics = HTTPUtil.getLyricsOnline(temp);
+                    while (lyrics == null) {
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    Message message = Message.obtain();
+                    message.what = 0;
+                    Bundle bundle = new Bundle();
+                    bundle.putString(Constant.Key.LYRICS, lyrics);
+                    message.setData(bundle);
+                    handler.sendMessage(message);
+                }
+            }
+        });
+    }
+
     private void getLyricsByGeCiMiAPI(final Music music, final Handler handler) {
         new Pool().getCachedThread().execute(new Runnable() {
             String base = null;
@@ -220,7 +292,7 @@ public class MusicPresenter implements MusicContract.Presenter {
                 message.what = 0;
                 Bundle bundle = new Bundle();
                 bundle.putString(Constant.Key.LYRICS, lyrics);
-                message.setData(new Bundle());
+                message.setData(bundle);
                 handler.sendMessage(message);
             }
         });
@@ -282,6 +354,8 @@ public class MusicPresenter implements MusicContract.Presenter {
                     }
                 case 666:
                     mMusicView.setCover(mBitmap);
+                    break;
+                case 1:
                     break;
                 default:
                     super.handleMessage(msg);

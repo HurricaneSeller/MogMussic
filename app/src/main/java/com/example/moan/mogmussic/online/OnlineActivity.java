@@ -95,12 +95,6 @@ public class OnlineActivity extends AppCompatActivity implements OnlineContract.
                 }));
     }
 
-    private byte[] toBytes(Bitmap bitmap){
-        int bytes = bitmap.getByteCount();
-        ByteBuffer byteBuffer = ByteBuffer.allocate(bytes);
-        bitmap.copyPixelsFromBuffer(byteBuffer);
-        return byteBuffer.array();
-    }
 
     private void showDialog(final OnlineSong onlineSong) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

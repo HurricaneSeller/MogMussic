@@ -7,12 +7,15 @@ import android.widget.SeekBar;
 
 import com.example.moan.mogmussic.data.music.Music;
 import com.example.moan.mogmussic.data.musiclist.MusicList;
+import com.example.moan.mogmussic.gson.OnlineSong;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public interface MusicContract {
     interface MusicView {
+        void setDownloadButton();
+
         void initCurrentTime();
 
         void setCurrentTime();
@@ -47,11 +50,11 @@ public interface MusicContract {
         // the init
         void initSong(Music music, SeekBar seekBar, Context context);
 
-        void initSong(Music music, SeekBar seekBar, Context context, String url);
+        void initSong(Music music, SeekBar seekBar, Context context, OnlineSong onlineSong);
 
         List<Music> setMusicList(List<Music> nowList, String musicString, Music music);
 
-        List<Music> setMusicList(List<Music> playingMusicList, Music music) ;
+        List<Music> setMusicList(List<Music> playingMusicList, Music music);
 
         List<Music> setMusicList(List<Music> playingMusicList, MusicList musicList);
 
@@ -62,6 +65,8 @@ public interface MusicContract {
         List<MusicList> getTotalList(Context context) throws ExecutionException, InterruptedException;
 
         void addToPlayingList(MusicList musicList, Context context, Music music);
+
+        public void downloadSong(final OnlineSong onlineSong, final Context context);
 
     }
 

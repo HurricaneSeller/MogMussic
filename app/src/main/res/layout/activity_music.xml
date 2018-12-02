@@ -18,15 +18,18 @@
             android:id="@+id/disk_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
+
             <include layout="@layout/disk_layout" />
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/lyrics_layout"
-            android:visibility="gone"
-            android:layout_marginTop="60dp"
             android:layout_width="match_parent"
             android:layout_height="400dp"
-            android:orientation="horizontal">
+            android:layout_marginTop="60dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
             <com.example.moan.mogmussic.music.view.LrcView
                 android:id="@+id/lyrics_view"
                 android:layout_width="match_parent"
@@ -58,7 +61,7 @@
             android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
             android:layout_marginHorizontal="5dp"
-            android:layout_toStartOf="@id/activity_music_like"
+            android:layout_toStartOf="@+id/info_layout"
             android:layout_toEndOf="@+id/activity_music_back"
             android:orientation="vertical">
 
@@ -89,14 +92,28 @@
                 tools:text="封茗囧菌" />
         </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/activity_music_like"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_alignParentEnd="true"
+        <LinearLayout
+            android:id="@+id/info_layout"
             android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
-            android:background="@drawable/ic_loyalty_orange_400_24dp" />
+            android:layout_alignParentEnd="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:visibility="gone"
+                android:id="@+id/activity_music_download"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/ic_file_download_orange_400_24dp" />
+            <ImageButton
+                android:id="@+id/activity_music_like"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/ic_loyalty_orange_400_24dp" />
+
+        </LinearLayout>
     </RelativeLayout>
 
     <ImageView

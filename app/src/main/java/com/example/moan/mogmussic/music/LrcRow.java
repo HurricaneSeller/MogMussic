@@ -1,5 +1,7 @@
 package com.example.moan.mogmussic.music;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -10,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LrcRow implements Comparable<LrcRow> {
+    private static final String TAG = "moanbigking";
     public String strTime;
     public long time;
     public String content;
@@ -62,7 +65,7 @@ public class LrcRow implements Comparable<LrcRow> {
                 + Integer.valueOf(times[2]);
     }
 
-    public static List<LrcRow> getLrcRows(String rawLrc) throws IOException {
+    static List<LrcRow> getLrcRows(String rawLrc) throws IOException {
         if (rawLrc == null || rawLrc.length() == 0) {
             return null;
         }

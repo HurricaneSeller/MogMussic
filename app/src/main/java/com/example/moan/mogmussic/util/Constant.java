@@ -67,6 +67,7 @@ public class Constant {
     }
 
     public class Key {
+        public static final String URL = "handler.base";
         public static final String LYRICS = "handler.lyrics";
         public static final String ONLINE = "mog.online";
     }

@@ -32,6 +32,7 @@ import com.example.moan.mogmussic.gson.OnlineSong;
 import com.example.moan.mogmussic.music.view.ILrcViewListener;
 import com.example.moan.mogmussic.music.view.LrcView;
 import com.example.moan.mogmussic.online.OAPresenter;
+import com.example.moan.mogmussic.online.OnlineActivity;
 import com.example.moan.mogmussic.util.MusicUtil;
 import com.example.moan.mogmussic.data.music.Music;
 import com.example.moan.mogmussic.data.musiclist.MusicList;
@@ -75,6 +76,8 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
     ImageButton btnPrevious;
     @BindView(R.id.activity_music_type)
     ImageButton btnType;
+    @BindView(R.id.activity_music_download)
+    ImageButton btnDownload;
     @BindView(R.id.activity_music_current_time)
     TextView currentTimeView;
     @BindView(R.id.activity_music_total_time)
@@ -393,6 +396,33 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
+    public void setDownloadButton() {
+        btnDownload.setVisibility(View.VISIBLE);
+        btnDownload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(onlineSong);
+            }
+        });
+    }
+
+
+    private void showDialog(final OnlineSong onlineSong) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("确定下载")
+                .setMessage(onlineSong.getTitle() + "-" + onlineSong.getAuthor())
+                .setCancelable(true)
+                .setPositiveButton(Constant.Words.PERMITTING_OK, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mMusicPresenter.downloadSong(onlineSong, MusicActivity.this);
+
+                    }
+                }).create().show();
+    }
+
+
+    @Override
     public void initCurrentTime() {
         currentTimeView.setText(TimeFormatUtil.getPerfectTime(0));
     }
@@ -519,7 +549,7 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
                     if (!isOnline) {
                         mMusicPresenter.initSong(playingMusic, mSeekBar, MusicActivity.this);
                     } else {
-                        mMusicPresenter.initSong(playingMusic, mSeekBar, MusicActivity.this, onlineSong.getPic());
+                        mMusicPresenter.initSong(playingMusic, mSeekBar, MusicActivity.this, onlineSong);
                     }
                     isBindFinished = true;
                     animatorStart();
