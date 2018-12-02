@@ -37,10 +37,18 @@
         android:layout_height="24dp"
         android:layout_centerInParent="true"
         android:layout_alignParentEnd="true"/>
-    <ImageView
+    <ImageButton
+        android:layout_marginEnd="10dp"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@id/item_delete"
+        android:background="@drawable/ic_alarm_add_orange_200_24dp"
+        android:id="@+id/item_clock"
+        android:layout_width="24dp"
+        android:layout_height="24dp" />
+    <ImageButton
         android:layout_marginEnd="10dp"
         android:layout_centerInParent="true"
-        android:layout_toStartOf="@id/item_delete"
+        android:layout_toStartOf="@id/item_clock"
         android:background="@drawable/ic_lock_orange_200_24dp"
         android:id="@+id/item_lock"
         android:layout_width="24dp"

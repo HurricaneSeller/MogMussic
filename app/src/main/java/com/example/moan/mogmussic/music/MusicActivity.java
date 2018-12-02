@@ -10,6 +10,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -188,15 +189,18 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
         bindService(musicIntent, mMyConn, BIND_AUTO_CREATE);
 
         IntentFilter intentFilter = new IntentFilter();
+        setAction(intentFilter);
+        registerReceiver(mBroadcastReceiver, intentFilter);
+    }
+
+    private void setAction(IntentFilter intentFilter) {
         intentFilter.addAction(Constant.Action.ACTION_UPDATE_TIME);
         intentFilter.addAction(Constant.Action.ACTION_SONG_FINISHED);
         intentFilter.addAction(Constant.Action.ACTION_BINDER_INIT);
         intentFilter.addAction(Constant.Action.ACTION_CONTROL_NOTIFICATION);
         intentFilter.addAction(Constant.Action.ACTION_FINISH);
-
-        registerReceiver(mBroadcastReceiver, intentFilter);
+        intentFilter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
     }
-
 
     private void setOnclickListener() {
         btnBack.setOnClickListener(this);
@@ -571,6 +575,9 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
                     break;
                 case Constant.Action.ACTION_FINISH:
                     finish();
+                    break;
+                case AudioManager.ACTION_AUDIO_BECOMING_NOISY:
+                    onClickControl();
                     break;
             }
         }

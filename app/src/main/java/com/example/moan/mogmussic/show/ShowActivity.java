@@ -32,7 +32,7 @@ import androidx.fragment.app.FragmentTransaction;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ShowActivity extends AppCompatActivity implements ShowContract.IChangeFra,ShowContract.ISetMusicList {
+public class ShowActivity extends AppCompatActivity implements ShowContract.IChangeFra, ShowContract.ISetMusicList {
     @BindView(R.id.activity_main_name)
     TextView nameView;
     @BindView(R.id.activity_main_artist)
@@ -46,6 +46,7 @@ public class ShowActivity extends AppCompatActivity implements ShowContract.ICha
     ImageView coverView;
 
     MusicList mMusicList = null;
+    private boolean isStaredSong = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +70,7 @@ public class ShowActivity extends AppCompatActivity implements ShowContract.ICha
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.colorOrange400));
 
     }
+
     @Override
     public void change(Fragment fragment) {
         FragmentManager manager = getSupportFragmentManager();
@@ -82,7 +84,8 @@ public class ShowActivity extends AppCompatActivity implements ShowContract.ICha
         barView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ShowActivity.this, MusicActivity.class));
+                if (isStaredSong)
+                    startActivity(new Intent(ShowActivity.this, MusicActivity.class));
             }
         });
     }
@@ -92,8 +95,9 @@ public class ShowActivity extends AppCompatActivity implements ShowContract.ICha
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (Constant.Action.ACTION_SET_VIEW.equals(action)) {
-                Music music = (Music)intent.getSerializableExtra("music");
+                Music music = (Music) intent.getSerializableExtra("music");
                 setView(music);
+                isStaredSong = true;
             }
         }
     };
@@ -102,8 +106,8 @@ public class ShowActivity extends AppCompatActivity implements ShowContract.ICha
         nameView.setText(music.getTitle());
         String info = music.getArtist() + ":" + music.getAlbum();
         artistView.setText(info);
-        coverView.setImageBitmap(MusicUtil.getArtWork(this, (int)music.getId() ,
-                (int)music.getAlbum_id(), true, music.getTitle()));
+        coverView.setImageBitmap(MusicUtil.getArtWork(this, (int) music.getId(),
+                (int) music.getAlbum_id(), true, music.getTitle()));
     }
 
     @Override
@@ -113,6 +117,7 @@ public class ShowActivity extends AppCompatActivity implements ShowContract.ICha
     }
 
     private long firstTime = 0;
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {

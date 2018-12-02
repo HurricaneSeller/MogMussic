@@ -4,7 +4,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.moan.mogmussic.R;
@@ -37,9 +36,7 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.View
         viewHolder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int position = viewHolder.getAdapterPosition();
-                MusicList musicList = mMusicListList.get(position);
-                mIChangeFragment.getMusicChosen(musicList);
+                mIChangeFragment.enterMusicListChosenPage(mMusicListList.get(viewHolder.getAdapterPosition()));
             }
         });
         viewHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
@@ -57,6 +54,12 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.View
                 });
             }
         });
+        viewHolder.clockButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mIChangeFragment.setClockPlayingChosenListMusics(mMusicListList.get(viewHolder.getAdapterPosition()));
+            }
+        });
         return viewHolder;
     }
 
@@ -69,9 +72,9 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.View
         String temp = "共" + count + "首";
         holder.numberView.setText(temp);
         if (musicList.isHasPassword()) {
-            holder.lockView.setVisibility(View.VISIBLE);
+            holder.lockButton.setVisibility(View.VISIBLE);
         } else {
-            holder.lockView.setVisibility(View.GONE);
+            holder.lockButton.setVisibility(View.GONE);
         }
     }
 
@@ -86,7 +89,8 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.View
         TextView numberView;
         ImageButton deleteButton;
         View mView;
-        ImageView lockView;
+        ImageButton lockButton;
+        ImageButton clockButton;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -94,12 +98,16 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.View
             titleView = itemView.findViewById(R.id.item_title);
             numberView = itemView.findViewById(R.id.item_number);
             deleteButton = itemView.findViewById(R.id.item_delete);
-            lockView = itemView.findViewById(R.id.item_lock);
+            lockButton = itemView.findViewById(R.id.item_lock);
+            clockButton = itemView.findViewById(R.id.item_clock);
         }
     }
 
     public interface IMusicChosen {
-        void getMusicChosen(MusicList musicListChosen);
+        void enterMusicListChosenPage(MusicList musicListChosen);
+
         void deleteMusicListChosen(MusicList musicListChosen);
+
+        void setClockPlayingChosenListMusics(MusicList musicListChosen);
     }
 }

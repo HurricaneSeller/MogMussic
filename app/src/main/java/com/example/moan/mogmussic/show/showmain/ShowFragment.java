@@ -33,12 +33,12 @@ import android.widget.Toast;
 import com.example.moan.mogmussic.R;
 import com.example.moan.mogmussic.data.musiclist.MusicList;
 import com.example.moan.mogmussic.online.OnlineActivity;
+import com.example.moan.mogmussic.music.ClockActivity;
 import com.example.moan.mogmussic.show.ShowActivity;
 import com.example.moan.mogmussic.show.ShowContract;
 import com.example.moan.mogmussic.show.showlist.ShowListFragment;
 import com.example.moan.mogmussic.show.showsong.ShowSongFragment;
 import com.example.moan.mogmussic.util.Constant;
-import com.example.moan.mogmussic.util.Pool;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,7 +127,7 @@ public class ShowFragment extends Fragment implements ShowContract.ShowView, Vie
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mMusicListAdapter = new MusicListAdapter(mMusicLists, new MusicListAdapter.IMusicChosen() {
             @Override
-            public void getMusicChosen(final MusicList musicListChosen) {
+            public void enterMusicListChosenPage(final MusicList musicListChosen) {
                 if (!mShowPresenter.hasPassword(musicListChosen)) {
                     mShowPresenter.setMusicList((ShowActivity) getActivity(), musicListChosen);
                     changeFragment((ShowActivity) getActivity(),
@@ -141,6 +141,13 @@ public class ShowFragment extends Fragment implements ShowContract.ShowView, Vie
             public void deleteMusicListChosen(MusicList musicListChosen) {
                 mMusicLists.remove(musicListChosen);
                 sendRefreshBroadcast();
+            }
+
+            @Override
+            public void setClockPlayingChosenListMusics(MusicList musicListChosen) {
+                Intent intent = new Intent(getActivity(), ClockActivity.class);
+                intent.putExtra("test", musicListChosen);
+                mShowPresenter.finishMusicActivityIfExisting(getActivity(), intent);
             }
         });
         mRecyclerView.setAdapter(mMusicListAdapter);
@@ -220,6 +227,10 @@ public class ShowFragment extends Fragment implements ShowContract.ShowView, Vie
                 break;
             case R.id.fra_search:
                 String input = searchView.getText().toString();
+                if (input.length() == 0) {
+                    Toast.makeText(getActivity(), "请输入有效内容", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 Intent intent = new Intent(getActivity(), OnlineActivity.class);
                 intent.putExtra(Constant.Key.ONLINE, input);
                 getActivity().startActivity(intent);

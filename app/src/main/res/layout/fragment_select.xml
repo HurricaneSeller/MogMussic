@@ -38,16 +38,6 @@
                         android:text="22222222222222222"
                         android:textColor="@color/colorWhite" />
 
-                    <Button
-                        android:id="@+id/fra_select_all"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_marginEnd="0dp"
-                        android:background="@null"
-                        android:text="全选"
-                        android:textColor="@color/colorWhite"
-                        android:textSize="15sp" />
                 </RelativeLayout>
             </androidx.appcompat.widget.Toolbar>
 

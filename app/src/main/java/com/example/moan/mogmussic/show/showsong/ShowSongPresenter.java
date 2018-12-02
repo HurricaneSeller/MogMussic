@@ -1,12 +1,15 @@
 package com.example.moan.mogmussic.show.showsong;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 
 import com.example.moan.mogmussic.data.music.Music;
@@ -24,10 +27,11 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 public class ShowSongPresenter implements ShowContract.ShowSongsPresenter {
+
     private ShowContract.ShowSongsView mShowSongsView;
     private String TAG = "moanbigking";
 
-    public ShowSongPresenter(ShowContract.ShowSongsView showSongsView) {
+    ShowSongPresenter(ShowContract.ShowSongsView showSongsView) {
         mShowSongsView = showSongsView;
     }
 
@@ -90,18 +94,20 @@ public class ShowSongPresenter implements ShowContract.ShowSongsPresenter {
     }
 
     @Override
-    public void getTotalMusic(final Context context) {
+    public void getTotalMusic(final Context context, final ShowContract.Callback callback) {
         new Pool().getSingleThread().execute(new Runnable() {
+            List<Music> mMusics = null;
             @Override
             public void run() {
-                final List<Music> music = MusicDatabase.getInstance(context).musicDao().getAll();
-                mShowSongsView.setTotalMusic(music);
-                ((ShowActivity) context).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mShowSongsView.setTotalSongNumber(music.size() + "");
+                mMusics = MusicDatabase.getInstance(context).musicDao().getAll();
+                while (mMusics == null) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                });
+                }
+                callback.showResponse(mMusics);
             }
         });
     }

@@ -2,6 +2,7 @@ package com.example.moan.mogmussic.show.showmain;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.util.Log;
 import com.example.moan.mogmussic.data.musiclist.MusicList;
 import com.example.moan.mogmussic.data.musiclist.MusicListDatabase;
 import com.example.moan.mogmussic.show.ShowContract;
+import com.example.moan.mogmussic.util.Constant;
 import com.example.moan.mogmussic.util.HTTPUtil;
 import com.example.moan.mogmussic.util.Pool;
 
@@ -84,4 +86,18 @@ public class ShowPresenter implements ShowContract.ShowMainPresenter {
         iSetMusicList.setMusicList(musicList);
     }
 
+    void finishMusicActivityIfExisting(final Context context, final Intent intent) {
+        new Pool().getSingleThread().execute(new Runnable() {
+            @Override
+            public void run() {
+                context.sendBroadcast(new Intent().setAction(Constant.Action.ACTION_FINISH));
+            }
+        });
+        new Pool().getSingleThread().execute(new Runnable() {
+            @Override
+            public void run() {
+                context.startActivity(intent);
+            }
+        });
+    }
 }

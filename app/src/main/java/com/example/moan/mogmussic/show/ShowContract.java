@@ -71,9 +71,6 @@ public interface ShowContract {
 
 
     interface ShowSongsView {
-        void setTotalSongNumber(String number);
-
-        void setTotalMusic(List<Music> musics);
 
     }
 
@@ -82,7 +79,7 @@ public interface ShowContract {
 
         void changeFragment(IChangeFra iChangeFra, Fragment fragment);
 
-        void getTotalMusic(Context context);
+        void getTotalMusic(Context context, ShowContract.Callback callback);
 
         void askForPermission(Context context);
 
@@ -111,4 +108,7 @@ public interface ShowContract {
 
     }
 
+    interface Callback<T> {
+        void showResponse(T result);
+    }
 }

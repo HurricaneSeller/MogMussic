@@ -135,6 +135,7 @@ public class HTTPUtil {
         return BitmapFactory.decodeStream(HTTPUtil.class.getResourceAsStream("/res/drawable/sample.jpg"));
     }
 
+
     public static void downloadSong(String play_url, String name, Context context) {
         Log.d(TAG, "downloadSong: " + play_url);
         String path = Environment.getExternalStorageDirectory().getPath();
@@ -150,6 +151,16 @@ public class HTTPUtil {
         DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(img));
         request.setDestinationInExternalPublicDir(path, name + ".jpg");
+        downloadManager.enqueue(request);
+    }
+    public static void downloadLyrics(String play_url, String name, Context context) {
+        Log.d(TAG, "downloadLyrics: ");
+        String path = "/lyrics/";
+        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(play_url));
+        request.setDestinationInExternalPublicDir(path, name + ".lrc");
+        request.setTitle("下载完成");
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         downloadManager.enqueue(request);
     }
 

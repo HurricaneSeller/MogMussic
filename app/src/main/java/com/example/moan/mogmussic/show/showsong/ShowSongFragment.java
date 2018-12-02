@@ -59,6 +59,7 @@ public class ShowSongFragment extends Fragment implements ShowContract.ShowSongs
     private List<Music> mMusics = new ArrayList<>();
     private View popupWindowView;
     private PopupWindow popupWindow;
+    private SongAdapter mAdapter;
 
     public ShowSongFragment() {
         // Required empty public constructor
@@ -80,8 +81,8 @@ public class ShowSongFragment extends Fragment implements ShowContract.ShowSongs
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_show_song, container, false);
-        new LoadAsyncTask().execute();
         ButterKnife.bind(this, view);
+        new LoadAsyncTask().execute();
         setOnClickListener();
         mSwipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(getActivity(),
                 R.color.colorOrange400));
@@ -94,17 +95,11 @@ public class ShowSongFragment extends Fragment implements ShowContract.ShowSongs
         btnPlayAll.setOnClickListener(this);
     }
 
-    @Override
-    public void setTotalSongNumber(String number) {
+    private void setTotalSongNumber(String number) {
         String temp = "(共" + number + "首)";
         numberView.setText(temp);
     }
 
-
-    @Override
-    public void setTotalMusic(List<Music> musics) {
-        mMusics = musics;
-    }
 
     private void showScanView() {
         popupWindowView = LayoutInflater.from(getActivity())
@@ -143,16 +138,24 @@ public class ShowSongFragment extends Fragment implements ShowContract.ShowSongs
 
         @Override
         protected Void doInBackground(Void... voids) {
-            mShowSongsPresenter.getTotalMusic(getActivity());
+            mShowSongsPresenter.getTotalMusic(getActivity(), new ShowContract.Callback() {
+                @Override
+                public void showResponse(Object result) {
+                    mMusics = (List<Music>) result;
+                }
+            });
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            Log.d(TAG, "onPostExecute: " + mMusics.size());
             mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-            mRecyclerView.setAdapter(new SongAdapter(mMusics));
+            mAdapter = new SongAdapter(mMusics);
+            mRecyclerView.setAdapter(mAdapter);
+
+            setTotalSongNumber(mMusics.size() + "");
+            mAdapter.notifyDataSetChanged();
         }
     }
 
@@ -165,7 +168,12 @@ public class ShowSongFragment extends Fragment implements ShowContract.ShowSongs
         @Override
         protected Void doInBackground(Void... voids) {
             mShowSongsPresenter.scanLocalSong(getActivity());
-            mShowSongsPresenter.getTotalMusic(getActivity());
+            mShowSongsPresenter.getTotalMusic(getActivity(), new ShowContract.Callback() {
+                @Override
+                public void showResponse(Object result) {
+                    mMusics = (List<Music>) result;
+                }
+            });
             searchView = popupWindowView.findViewById(R.id.fragment_scan_song_search);
             finishView = popupWindowView.findViewById(R.id.fragment_scan_song_finished);
             animation = new SearchAnimation(50);
@@ -183,6 +191,8 @@ public class ShowSongFragment extends Fragment implements ShowContract.ShowSongs
 
         @Override
         protected void onPostExecute(Void aVoid) {
+            setTotalSongNumber(mMusics.size() + "");
+            mAdapter.notifyDataSetChanged();
             animation.cancel();
             finishView.setVisibility(View.VISIBLE);
             searchView.setVisibility(View.GONE);
@@ -211,15 +221,14 @@ public class ShowSongFragment extends Fragment implements ShowContract.ShowSongs
             String action = intent.getAction();
             if (Constant.Action.ACTION_START_MUSIC.equals(action)) {
                 String where = intent.getStringExtra(Constant.Where.WHERE);
-                if(Constant.Where.WHERE_CLICK_SONG.equals(where)) {
+                if (Constant.Where.WHERE_CLICK_SONG.equals(where)) {
                     Music music = (Music) intent.getSerializableExtra(Constant.MUSIC_CLICKED);
                     Intent musicIntent = new Intent(getActivity(), MusicActivity.class);
                     musicIntent.putExtra(Constant.Where.WHERE, Constant.Where.WHERE_CLICK_LOCAL_SONG);
                     musicIntent.putExtra(Constant.MUSIC_CLICKED, music);
 
                     mShowSongsPresenter.startMusicActivity(musicIntent, getActivity());
-                }
-                else if (Constant.Where.WHERE_CLICK_LOCAL_PLAY_ALL.equals(where)) {
+                } else if (Constant.Where.WHERE_CLICK_LOCAL_PLAY_ALL.equals(where)) {
                     Intent musicIntent = new Intent(getActivity(), MusicActivity.class);
                     musicIntent.putExtra(Constant.Where.WHERE, Constant.Where.WHERE_CLICK_LOCAL_PLAY_ALL);
                     mShowSongsPresenter.startMusicActivity(musicIntent, getActivity());

@@ -24,7 +24,7 @@
                 android:gravity="center_vertical">
 
                 <EditText
-                    android:hint="音乐/歌手/歌单"
+                    android:hint="音乐"
                     android:theme="@style/MyEditLine"
                     android:textColor="@color/colorWhite"
                     android:id="@+id/fra_edit"

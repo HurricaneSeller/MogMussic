@@ -40,8 +40,6 @@ public class SelectSongFragment extends Fragment implements View.OnClickListener
     ImageButton btnBack;
     @BindView(R.id.fra_select_text)
     TextView numberView;
-    @BindView(R.id.fra_select_all)
-    Button btnSelectAll;
     @BindView(R.id.fra_select_recycler_view)
     RecyclerView mRecyclerView;
     @BindView(R.id.fra_select_floating_button)
@@ -53,7 +51,6 @@ public class SelectSongFragment extends Fragment implements View.OnClickListener
     private SelectPresenter mSelectPresenter;
     private String TAG = "moanbigking";
     private MusicList musicList;
-    private MyAdapter myAdapter;
 
 
     @Override
@@ -73,7 +70,6 @@ public class SelectSongFragment extends Fragment implements View.OnClickListener
                 PorterDuff.Mode.SRC_IN);
         btnBack.setOnClickListener(this);
         btnCheck.setOnClickListener(this);
-        btnSelectAll.setOnClickListener(this);
         setNumberView(0);
         return view;
     }
@@ -94,9 +90,6 @@ public class SelectSongFragment extends Fragment implements View.OnClickListener
                     }
                 });
                 popBackStack();
-                break;
-            case R.id.fra_select_all:
-                // TODO: 12/1/18  
                 break;
         }
     }
@@ -119,7 +112,7 @@ public class SelectSongFragment extends Fragment implements View.OnClickListener
     @Override
     public void initRecyclerView(List<Music> music) {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        myAdapter = new MyAdapter(music);
+        MyAdapter myAdapter = new MyAdapter(music);
         mRecyclerView.setAdapter(myAdapter);
     }
 
@@ -197,28 +190,8 @@ public class SelectSongFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void onDestroy() {
-//        getActivity().unregisterReceiver(mBroadcastReceiver);
         super.onDestroy();
     }
 
-//    BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(final Context context, Intent intent) {
-//            String action = intent.getAction();
-//            if (Constant.Action.ACTION_CHANGE_FRAGMENT_ANOTHER.equals(action)) {
-//                musicList = (MusicList) intent.getSerializableExtra(Constant.LIST_CLICKED);
-////                alreadyCollectedSongs = MusicUtil.fromString(musicList.getMusicJsonString());
-//                Message message = new Message();
-//                message.what = 1;
-//                Bundle bundle = new Bundle();
-//                bundle.putSerializable("test", musicList);
-//                message.setData(bundle);
-//                mSelectPresenter.mHandler.sendMessage(message);
-//
-//                setNumberView(0);
-//                mSelectPresenter.loadLocalSong(getActivity());
-//            }
-//        }
-//    };
 
 }

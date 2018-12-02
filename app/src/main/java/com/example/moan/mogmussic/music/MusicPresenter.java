@@ -41,6 +41,8 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import androidx.core.util.Pools;
+
 public class MusicPresenter implements MusicContract.Presenter {
     private MusicContract.MusicView mMusicView;
     private String TAG = "moanbigking";
@@ -172,7 +174,12 @@ public class MusicPresenter implements MusicContract.Presenter {
                 HTTPUtil.downloadCover(onlineSong.getPic(), onlineSong.getTitle(), context);
             }
         });
-
+        new Pool().getCachedThread().execute(new Runnable() {
+            @Override
+            public void run() {
+                HTTPUtil.downloadLyrics(onlineSong.getLrc(), onlineSong.getTitle(), context);
+            }
+        });
 
     }
 
@@ -215,52 +222,72 @@ public class MusicPresenter implements MusicContract.Presenter {
     }
 
     private void getLyricsByKuGouAPI(final OnlineSong onlineSong, final Handler handler) {
-        String standard = onlineSong.getUrl();
-        String id = null;
-        Pattern pattern = Pattern.compile("id=([\\S\\s])*&");
-        Matcher matcher = pattern.matcher(standard);
-        if (matcher.find()) {
-            id = matcher.group();
-        }
-        final String finalId = id.substring(3, id.length() - 1);
-        Log.d(TAG, "getLyricsByKuGouAPI: " + finalId);
         new Pool().getCachedThread().execute(new Runnable() {
-            String base = null;
             String lyrics = null;
-
             @Override
             public void run() {
-                base = HTTPUtil.getResponse("020222", "SongId", finalId);
-                String temp = null;
-                while (base == null) {
+                lyrics = HTTPUtil.getLyricsOnline(onlineSong.getLrc());
+                while (lyrics == null) {
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(50);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
-                Pattern pattern1 = Pattern.compile("\"Body\":\"([\\S\\s])*&type=lrc");
-                Matcher matcher1 = pattern1.matcher(base);
-                if (matcher1.find()) {
-                    temp = matcher1.group();
-                    temp = temp.substring(8, temp.length());
-                    lyrics = HTTPUtil.getLyricsOnline(temp);
-                    while (lyrics == null) {
-                        try {
-                            Thread.sleep(50);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    Message message = Message.obtain();
-                    message.what = 0;
-                    Bundle bundle = new Bundle();
-                    bundle.putString(Constant.Key.LYRICS, lyrics);
-                    message.setData(bundle);
-                    handler.sendMessage(message);
-                }
+                Message message = Message.obtain();
+                message.what = 0;
+                Bundle bundle = new Bundle();
+                bundle.putString(Constant.Key.LYRICS, lyrics);
+                message.setData(bundle);
+                handler.sendMessage(message);
             }
         });
+//        String standard = onlineSong.getUrl();
+//        String id = null;
+//        Pattern pattern = Pattern.compile("id=([\\S\\s])*&");
+//        Matcher matcher = pattern.matcher(standard);
+//        if (matcher.find()) {
+//            id = matcher.group();
+//        }
+//        final String finalId = id.substring(3, id.length() - 1);
+//        Log.d(TAG, "getLyricsByKuGouAPI: " + finalId);
+//        new Pool().getCachedThread().execute(new Runnable() {
+//            String base = null;
+//            String lyrics = null;
+//
+//            @Override
+//            public void run() {
+//                base = HTTPUtil.getResponse("020222", "SongId", finalId);
+//                String temp = null;
+//                while (base == null) {
+//                    try {
+//                        Thread.sleep(100);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//                Pattern pattern1 = Pattern.compile("\"Body\":\"([\\S\\s])*&type=lrc");
+//                Matcher matcher1 = pattern1.matcher(base);
+//                if (matcher1.find()) {
+//                    temp = matcher1.group();
+//                    temp = temp.substring(8, temp.length());
+//                    lyrics = HTTPUtil.getLyricsOnline(temp);
+//                    while (lyrics == null) {
+//                        try {
+//                            Thread.sleep(50);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                    Message message = Message.obtain();
+//                    message.what = 0;
+//                    Bundle bundle = new Bundle();
+//                    bundle.putString(Constant.Key.LYRICS, lyrics);
+//                    message.setData(bundle);
+//                    handler.sendMessage(message);
+//                }
+//            }
+//        });
     }
 
     private void getLyricsByGeCiMiAPI(final Music music, final Handler handler) {
@@ -352,6 +379,7 @@ public class MusicPresenter implements MusicContract.Presenter {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    break;
                 case 666:
                     mMusicView.setCover(mBitmap);
                     break;

@@ -16,6 +16,7 @@ import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
 import com.example.moan.mogmussic.R;
@@ -47,6 +48,13 @@ public class OnlineActivity extends AppCompatActivity implements OnlineContract.
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         mOAPresenter.sendOkHttpRequest(input);
+        ImageButton imageButton = findViewById(R.id.online_back);
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private void hideActionBar() {

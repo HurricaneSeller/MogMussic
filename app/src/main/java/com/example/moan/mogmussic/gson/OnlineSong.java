@@ -10,6 +10,15 @@ public class OnlineSong implements Serializable {
     private int time;
     private String url;
     private String pic;
+    private String lrc;
+
+    public String getLrc() {
+        return lrc;
+    }
+
+    public void setLrc(String lrc) {
+        this.lrc = lrc;
+    }
 
     public String getTitle() {
         return title;

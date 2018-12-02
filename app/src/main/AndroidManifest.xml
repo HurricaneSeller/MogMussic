@@ -29,7 +29,8 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".online.OnlineActivity"></activity>
+        <activity android:name=".online.OnlineActivity" />
+        <activity android:name=".music.ClockActivity"></activity>
     </application>
 
 </manifest>

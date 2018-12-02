@@ -50,6 +50,7 @@ public class OAPresenter implements OnlineContract.OnlineActivityContract {
             @Override
             public void run() {
                 info = HTTPUtil.getResponse(TRANSCODE_SEARCH_MUSIC, "key", input);
+                Log.d(TAG, "run: ");
                 while (info == null) {
                     try {
                         Thread.sleep(100);
@@ -77,6 +78,12 @@ public class OAPresenter implements OnlineContract.OnlineActivityContract {
             @Override
             public void run() {
                 HTTPUtil.downloadCover(onlineSong.getPic(), onlineSong.getTitle(), context);
+            }
+        });
+        new Pool().getCachedThread().execute(new Runnable() {
+            @Override
+            public void run() {
+                HTTPUtil.downloadLyrics(onlineSong.getLrc(), onlineSong.getTitle(), context);
             }
         });
     }
