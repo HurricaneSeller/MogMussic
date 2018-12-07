@@ -9,7 +9,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -32,8 +31,6 @@ import com.example.moan.mogmussic.R;
 import com.example.moan.mogmussic.gson.OnlineSong;
 import com.example.moan.mogmussic.music.view.ILrcViewListener;
 import com.example.moan.mogmussic.music.view.LrcView;
-import com.example.moan.mogmussic.online.OAPresenter;
-import com.example.moan.mogmussic.online.OnlineActivity;
 import com.example.moan.mogmussic.util.MusicUtil;
 import com.example.moan.mogmussic.data.music.Music;
 import com.example.moan.mogmussic.data.musiclist.MusicList;
@@ -396,7 +393,7 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void setCurrentTime() {
-        currentTimeView.setText(TimeFormatUtil.getPerfectTime(mMyBinder.getCurrentDuration()));
+        currentTimeView.setText(TimeFormatUtil.getLyricsTime(mMyBinder.getCurrentDuration()));
     }
 
     @Override
@@ -428,7 +425,7 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void initCurrentTime() {
-        currentTimeView.setText(TimeFormatUtil.getPerfectTime(0));
+        currentTimeView.setText(TimeFormatUtil.getLyricsTime(0));
     }
 
     @Override

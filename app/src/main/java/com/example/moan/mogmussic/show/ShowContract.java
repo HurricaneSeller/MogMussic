@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 
 import com.example.moan.mogmussic.data.music.Music;
 import com.example.moan.mogmussic.data.musiclist.MusicList;
+import com.example.moan.mogmussic.show.showmain.ShowPresenter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,8 +23,7 @@ public interface ShowContract {
     }
 
     interface ShowView {
-        void setListsNumber(String number);
-
+        void setPresenter(ShowPresenter showPresenter);
 
         void setMusicLists(List<MusicList> musicLists);
 
@@ -33,11 +33,11 @@ public interface ShowContract {
     }
 
     interface ShowMainPresenter {
-        void getTotalLists(Context context);
+        void getTotalLists();
 
-        void createList(String name, String password, Context context);
+        void createList(String name, String password);
 
-        void createList(String name, Context context);
+        void createList(String name);
 
         boolean hasPassword(MusicList musicList);
 

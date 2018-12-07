@@ -33,7 +33,7 @@ import android.widget.Toast;
 import com.example.moan.mogmussic.R;
 import com.example.moan.mogmussic.data.musiclist.MusicList;
 import com.example.moan.mogmussic.online.OnlineActivity;
-import com.example.moan.mogmussic.music.ClockActivity;
+import com.example.moan.mogmussic.clock.ClockActivity;
 import com.example.moan.mogmussic.show.ShowActivity;
 import com.example.moan.mogmussic.show.ShowContract;
 import com.example.moan.mogmussic.show.showlist.ShowListFragment;
@@ -76,7 +76,8 @@ public class ShowFragment extends Fragment implements ShowContract.ShowView, Vie
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mShowPresenter = new ShowPresenter(this);
+        mShowPresenter.test();
+        //mShowPresenter = new ShowPresenter(this);
     }
 
     @Override
@@ -84,7 +85,6 @@ public class ShowFragment extends Fragment implements ShowContract.ShowView, Vie
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("mog.refresh_list");
         getActivity().registerReceiver(mBroadcastReceiver, intentFilter);
-        Log.d(TAG, "onCreate: register");
         super.onResume();
     }
 
@@ -106,7 +106,7 @@ public class ShowFragment extends Fragment implements ShowContract.ShowView, Vie
 
         @Override
         protected Void doInBackground(Void... voids) {
-            mShowPresenter.getTotalLists(getActivity());
+            mShowPresenter.getTotalLists();
             return null;
         }
 
@@ -115,11 +115,6 @@ public class ShowFragment extends Fragment implements ShowContract.ShowView, Vie
             super.onPostExecute(aVoid);
             initView();
         }
-    }
-
-    @Override
-    public void setListsNumber(String number) {
-        numberView.setText(number);
     }
 
 
@@ -151,6 +146,11 @@ public class ShowFragment extends Fragment implements ShowContract.ShowView, Vie
             }
         });
         mRecyclerView.setAdapter(mMusicListAdapter);
+    }
+
+    @Override
+    public void setPresenter(ShowPresenter showPresenter) {
+        mShowPresenter = showPresenter;
     }
 
     @Override
@@ -216,9 +216,9 @@ public class ShowFragment extends Fragment implements ShowContract.ShowView, Vie
                             public void onClick(DialogInterface dialog, int which) {
                                 if (checkBox.isChecked()) {
                                     mShowPresenter.createList(titleView.getText().toString(),
-                                            passwordView.getText().toString(), getActivity());
+                                            passwordView.getText().toString());
                                 } else {
-                                    mShowPresenter.createList(titleView.getText().toString(), getActivity());
+                                    mShowPresenter.createList(titleView.getText().toString());
                                 }
                                 sendRefreshBroadcast();
                             }

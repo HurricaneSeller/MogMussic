@@ -1,19 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".music.ClockActivity">
+    tools:context=".clock.ClockActivity">
 
     <TextView
-        android:id="@+id/clock_clock"
+        android:id="@+id/counting_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_width="200dp"
-        android:layout_height="70dp"
-        android:layout_margin="5dp"
-        android:gravity="center"
-        android:textSize="40sp"
-        android:textStyle="bold"
-        android:text="0 0 : 0 0" />
+        android:gravity="center_horizontal"
+        android:textSize="60sp"
+        tools:text="00:00" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/counting_view"
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/choose_time_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="时"
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginBottom="10dp"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/hour_increase"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/ic_arrow_drop_up_orange_a400_24dp" />
+
+                <com.example.moan.mogmussic.clock.WheelView
+                    android:id="@+id/hour_wheel_view"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content" />
+
+                <ImageButton
+                    android:id="@+id/hour_decrease"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/ic_arrow_drop_down_orange_a400_24dp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="分"
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/minute_increase"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/ic_arrow_drop_up_orange_a400_24dp" />
+
+                <com.example.moan.mogmussic.clock.WheelView
+                    android:id="@+id/minute_wheel_view"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content" />
+
+                <ImageButton
+                    android:id="@+id/minute_decrease"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/ic_arrow_drop_down_orange_a400_24dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/set_clock"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_check_orange_400_48dp"
+            app:civ_border_color="@color/colorOrange400"
+            app:civ_border_width="4dp" />
+
+    </LinearLayout>
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:layout_below="@+id/counting_view"
+        android:id="@+id/cancel_clock"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/ic_clear_orange_400_48dp"
+        android:visibility="gone"
+        app:civ_border_color="@color/colorOrange400"
+        app:civ_border_width="4dp" />
 
 </RelativeLayout>

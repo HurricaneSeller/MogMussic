@@ -20,6 +20,7 @@ import com.example.moan.mogmussic.data.music.Music;
 import com.example.moan.mogmussic.data.musiclist.MusicList;
 import com.example.moan.mogmussic.music.MusicActivity;
 import com.example.moan.mogmussic.show.showmain.ShowFragment;
+import com.example.moan.mogmussic.show.showmain.ShowPresenter;
 import com.example.moan.mogmussic.util.Constant;
 import com.example.moan.mogmussic.util.MusicUtil;
 
@@ -54,7 +55,10 @@ public class ShowActivity extends AppCompatActivity implements ShowContract.ICha
         setContentView(R.layout.activity_show);
         ButterKnife.bind(this);
         hideActionBar();
-        change(new ShowFragment());
+
+        ShowFragment showFragment = new ShowFragment();
+        new ShowPresenter(showFragment, getApplicationContext());
+        change(showFragment);
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Constant.Action.ACTION_SET_VIEW);

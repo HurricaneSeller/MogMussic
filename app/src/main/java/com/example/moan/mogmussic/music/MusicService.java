@@ -70,7 +70,7 @@ public class MusicService extends Service {
 
 
     @SuppressLint("HandlerLeak")
-    class MyBinder extends Binder implements MusicContract.IMusicControl {
+    public class MyBinder extends Binder implements MusicContract.IMusicControl {
 
         @Override
         public void start() {

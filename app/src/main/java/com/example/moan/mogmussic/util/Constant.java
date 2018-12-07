@@ -64,6 +64,9 @@ public class Constant {
 
     public class Words {
         public static final String PERMITTING_OK = "确定";
+        public static final String QUIT_CLOCK_MODE = "确定退出时钟模式？";
+        public static final String PERMITTING_DENY = "取消";
+        public static final String WARNING = "真的考虑好了吗？此操作不可撤销！";
     }
 
     public class Key {

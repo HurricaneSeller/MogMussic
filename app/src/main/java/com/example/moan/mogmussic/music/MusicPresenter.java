@@ -1,18 +1,12 @@
 package com.example.moan.mogmussic.music;
 
 import android.annotation.SuppressLint;
-import android.content.ContentUris;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.ParcelFileDescriptor;
-import android.util.Log;
 import android.widget.SeekBar;
-import android.widget.TabHost;
 
 import com.example.moan.mogmussic.data.music.Music;
 import com.example.moan.mogmussic.data.music.MusicDatabase;
@@ -27,21 +21,14 @@ import com.example.moan.mogmussic.util.TimeFormatUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import androidx.core.util.Pools;
 
 public class MusicPresenter implements MusicContract.Presenter {
     private MusicContract.MusicView mMusicView;
@@ -56,7 +43,7 @@ public class MusicPresenter implements MusicContract.Presenter {
 
     @Override
     public void initSong(Music music, SeekBar seekBar, Context context) {
-        mMusicView.setTotalTime(TimeFormatUtil.getPerfectTime(music.getDuration()));
+        mMusicView.setTotalTime(TimeFormatUtil.getLyricsTime(music.getDuration()));
         mMusicView.setInfo(music.getArtist() + "-" + music.getAlbum());
         mMusicView.setTitle(music.getTitle());
         mMusicView.initCurrentTime();
@@ -72,7 +59,7 @@ public class MusicPresenter implements MusicContract.Presenter {
 
     @Override
     public void initSong(Music music, SeekBar seekBar, Context context, final OnlineSong onlineSong) {
-        mMusicView.setTotalTime(TimeFormatUtil.getPerfectTime(music.getDuration()));
+        mMusicView.setTotalTime(TimeFormatUtil.getLyricsTime(music.getDuration()));
         mMusicView.setInfo(music.getArtist() + "-" + music.getAlbum());
         mMusicView.setTitle(music.getTitle());
         mMusicView.initCurrentTime();
